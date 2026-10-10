@@ -1,0 +1,11 @@
+{
+  "name": "common-room-blog-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Simple community blog with member sign-up and JSON storage",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": { "node": ">=18" }
+}
+

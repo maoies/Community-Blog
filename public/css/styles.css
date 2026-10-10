@@ -1,0 +1,31 @@
+/* Bootstrap handles the grid, form controls, buttons, and table. */
+:root { --ink: #253c33; --accent: #bc4624; }
+body { background: #faf8f1; color: var(--ink); font-family: "Segoe UI", Arial, sans-serif; }
+.container { max-width: 1080px; }
+.site-header { background: #fff; border-bottom: 1px solid #deded2; }
+.navbar { min-height: 76px; gap: 10px; }
+.navbar-brand { color: var(--ink); font-weight: 700; font-size: 22px; }
+.nav-link { color: #65716b; }
+.nav-link:hover, .nav-link.active { color: var(--accent); }
+.nav-link.active { font-weight: 700; }
+.hero { padding: 65px 0; max-width: 780px; }
+.hero h1 { font-size: clamp(32px, 4vw, 48px); font-weight: 700; margin-bottom: 22px; }
+.hero .lead { color: #65716b; line-height: 1.8; margin-bottom: 28px; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; color: var(--accent); }
+h2 { font-size: 28px; font-weight: 650; }
+.card { border-color: #deded2; border-radius: 8px; }
+.card-body { padding: 25px; }
+.card p:last-child { color: #65716b; line-height: 1.8; margin-bottom: 0; }
+.about { padding: 28px; background: #e4eadc; border-radius: 8px; line-height: 1.8; }
+.btn-primary { --bs-btn-bg: var(--accent); --bs-btn-border-color: var(--accent); --bs-btn-hover-bg: #963519; --bs-btn-hover-border-color: #963519; --bs-btn-active-bg: #963519; --bs-btn-active-border-color: #963519; --bs-btn-disabled-bg: var(--accent); --bs-btn-disabled-border-color: var(--accent); }
+.btn { padding: 10px 20px; }
+.form-panel, .member-panel { background: #fff; border: 1px solid #deded2; padding: 28px; border-radius: 8px; }
+.form-panel { max-width: 640px; }
+.form-label { font-size: 14px; font-weight: 600; }
+.form-control { padding: 10px 12px; }
+.form-control:focus { border-color: #adbcaa; box-shadow: 0 0 0 3px #253c3315; }
+.table { font-size: 14px; }
+.table th { background: #f4f5ef; white-space: nowrap; }
+.table td { overflow-wrap: anywhere; min-width: 60px; max-width: 240px; }
+.table .btn { padding: 5px 12px; }
+.site-footer { padding-top: 22px; padding-bottom: 22px; border-top: 1px solid #deded2; color: #65716b; font-size: 13px; }

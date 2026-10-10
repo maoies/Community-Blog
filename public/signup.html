@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign Up | The Common Room</title>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <script defer src="js/validation.js"></script>
+  <script defer src="js/signup.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container" aria-label="Main navigation">
+      <a class="navbar-brand" href="index.html">The Common Room</a>
+      <div class="nav"><a class="nav-link" href="index.html">Home</a><a class="nav-link active" href="signup.html" aria-current="page">Sign Up</a></div>
+    </nav>
+  </header>
+  <main class="container py-5">
+    <section class="form-panel mx-auto" aria-labelledby="form-title">
+      <p class="eyebrow">JOIN THE COMMUNITY</p>
+      <h1 id="form-title" class="h2">Member sign-up</h1>
+      <p class="text-secondary">Fields marked * are required.</p>
+      <div id="form-message" class="alert d-none" role="status"></div>
+      <form id="member-form" novalidate>
+        <div class="mb-3"><label class="form-label" for="fullName">Full name *</label><input class="form-control" type="text" id="fullName" name="fullName" autocomplete="name" maxlength="80" required aria-describedby="fullName-error"><div class="invalid-feedback" id="fullName-error"></div></div>
+        <div class="mb-3"><label class="form-label" for="email">Email address *</label><input class="form-control" type="email" id="email" name="email" autocomplete="email" maxlength="254" required aria-describedby="email-error"><div class="invalid-feedback" id="email-error"></div></div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-4"><label class="form-label" for="age">Age *</label><input class="form-control" type="number" id="age" name="age" min="13" max="120" step="1" required aria-describedby="age-error"><div class="invalid-feedback" id="age-error"></div></div>
+          <div class="col-md-8"><label class="form-label" for="phone">Phone number (optional)</label><input class="form-control" type="tel" id="phone" name="phone" autocomplete="tel" maxlength="30" aria-describedby="phone-error"><div class="invalid-feedback" id="phone-error"></div></div>
+        </div>
+        <div class="mb-4"><label class="form-label" for="address">Address *</label><textarea class="form-control" id="address" name="address" rows="2" autocomplete="street-address" maxlength="200" required aria-describedby="address-error"></textarea><div class="invalid-feedback" id="address-error"></div></div>
+        <button class="btn btn-primary" id="submit-button" type="submit">Register</button>
+        <button class="btn btn-outline-secondary d-none ms-2" id="cancel-button" type="button">Cancel edit</button>
+      </form>
+    </section>
+    <section class="member-panel mt-5" aria-labelledby="members-title">
+      <h2 id="members-title" class="h4">Community members</h2>
+      <p class="text-secondary">Submitted members appear below. Use Edit to update a record.</p>
+      <div id="list-message" class="text-secondary" role="status">Loading members…</div>
+      <div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th scope="col">Full name</th><th scope="col">Email</th><th scope="col">Age</th><th scope="col">Phone</th><th scope="col">Address</th><th scope="col">Action</th></tr></thead><tbody id="members-body"></tbody></table></div>
+    </section>
+  </main>
+  <footer class="container site-footer">The Common Room · Community Blog · Lab 06</footer>
+</body>
+</html>
