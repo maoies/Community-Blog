@@ -1,4 +1,3 @@
-// A small local service is needed to write form data to an actual JSON file.
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
