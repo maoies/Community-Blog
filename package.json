@@ -4,8 +4,13 @@
   "private": true,
   "description": "Simple community blog with member sign-up and JSON storage",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0"
+  }
 }
-
