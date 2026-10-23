@@ -77,5 +77,7 @@ save errors and retries, duplicate submissions, member API behavior, image MIME
 types, HEAD responses, page assets, and L7 catalog loading/search/validation/
 creation/editing/restoration with the bundled jQuery library.
 
-jsdom does not verify visual layout, native dialog focus, or actual browser
-downloads. Those require a browser check.
+Browser checks covered the homepage, product page, and member form at 375 px,
+and native discard-dialog focus, Escape, and discard behavior.
+The JSON export data passed automated checks. Native download completion could
+not be confirmed through the browser automation interface.
