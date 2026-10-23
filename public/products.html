@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product Details | The Community Hub</title>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/products.css">
+  <script defer src="vendor/jquery-3.7.1.min.js"></script>
+  <script defer src="js/product-catalog.js"></script>
+  <script defer src="js/products.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header">
+    <nav class="navbar container" aria-label="Main navigation">
+      <a class="navbar-brand" href="index.html">The Community Hub<span class="brand-dot" aria-hidden="true">.</span></a>
+      <div class="nav">
+        <a class="nav-link" href="index.html">Home</a>
+        <a class="nav-link" href="index.html#stories-title">Stories</a>
+        <a class="nav-link active" href="products.html" aria-current="page">Products</a>
+        <a class="nav-link" href="signup.html">Sign Up</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container products-main" id="main-content" tabindex="-1">
+    <div class="products-heading">
+      <div>
+        <p class="eyebrow mb-2">THE COMMUNITY COLLECTION</p>
+        <h1>Product management</h1>
+        <p class="text-secondary mb-0">A few good resources for reading, creating, and coming together.</p>
+      </div>
+      <div class="button-row products-toolbar">
+        <button class="btn btn-outline-secondary" id="export-products" type="button" disabled>Download JSON</button>
+        <button class="btn btn-primary" id="new-product" type="button" disabled>Add product</button>
+      </div>
+    </div>
+
+    <noscript><p class="alert alert-warning">Enable JavaScript to search and edit products.</p></noscript>
+    <div id="catalog-notice" class="alert alert-warning d-none" role="status"></div>
+    <div id="catalog-message" class="catalog-status" role="status" aria-live="polite">Loading products...</div>
+    <button id="retry-load" class="btn btn-outline-secondary d-none mb-4" type="button">Try again</button>
+
+    <div class="row g-4 align-items-start">
+      <section class="col-lg-5" aria-labelledby="catalog-title">
+        <div class="catalog-panel">
+          <div class="panel-heading">
+            <h2 id="catalog-title">Your catalog</h2>
+            <span class="resource-count" id="catalog-count">Loading</span>
+          </div>
+          <form id="search-form" role="search">
+            <fieldset id="search-fields" disabled>
+              <label class="form-label" for="search-query">Search by ID or name</label>
+              <div class="search-row">
+                <input class="form-control" type="search" id="search-query" placeholder="e.g. P101 or reading" maxlength="80">
+                <button class="btn btn-primary" type="submit">Search</button>
+              </div>
+              <label class="form-label mt-3" for="category-filter">Category</label>
+              <select class="form-select" id="category-filter"><option value="">All categories</option></select>
+            </fieldset>
+          </form>
+          <div class="results-heading">
+            <p id="result-count" class="mb-0 text-secondary" role="status">Waiting for products</p>
+            <button class="clear-search" type="button" id="clear-search" disabled>Clear filters</button>
+          </div>
+          <ul class="product-list" id="product-list" aria-label="Products"></ul>
+          <div class="empty-results d-none" id="empty-results">
+            <p class="fw-semibold mb-1">No products found</p>
+            <p class="text-secondary mb-0">Try another ID or name, or clear your filters.</p>
+          </div>
+        </div>
+        <p class="catalog-footnote">Digital guides, magazines, and resources from our community. Prices are in USD.</p>
+      </section>
+
+      <section class="col-lg-7" aria-labelledby="editor-title">
+        <div class="editor-panel" id="editor-panel">
+          <div class="panel-heading editor-heading">
+            <div>
+              <p class="eyebrow mb-2">PRODUCT DETAILS</p>
+              <h2 id="editor-title" tabindex="-1">Choose a product</h2>
+            </div>
+            <span class="edit-state" id="edit-state" role="status">No selection</span>
+          </div>
+          <div class="editor-placeholder" id="editor-placeholder">
+            <p class="fw-semibold mb-1">A little detail goes a long way.</p>
+            <p class="text-secondary mb-0">Choose a resource from the catalog to view and edit its details.</p>
+          </div>
+          <div id="editor-content" class="d-none">
+            <div id="edit-message" class="alert d-none" role="status" aria-live="polite"></div>
+            <form id="product-form" novalidate>
+              <div class="editor-section">
+                <h3>01 <span>About this resource</span></h3>
+                <p class="text-secondary small">Fields marked * are required.</p>
+                <div class="mb-3">
+                  <label class="form-label" for="productId">Product ID *</label>
+                  <input class="form-control product-id" id="productId" name="productId" required maxlength="4" pattern="P[0-9]{3}" readonly aria-describedby="productId-help productId-error">
+                  <div class="invalid-feedback" id="productId-error"></div>
+                  <div class="form-text" id="productId-help">A permanent reference for this resource.</div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="name">Product name *</label>
+                  <input class="form-control" id="name" name="name" required maxlength="80" aria-describedby="name-error">
+                  <div class="invalid-feedback" id="name-error"></div>
+                </div>
+                <div>
+                  <label class="form-label" for="description">Description *</label>
+                  <textarea class="form-control" id="description" name="description" rows="4" required maxlength="500" aria-describedby="description-error"></textarea>
+                  <div class="invalid-feedback" id="description-error"></div>
+                </div>
+              </div>
+              <div class="editor-section">
+                <h3>02 <span>Organization &amp; pricing</span></h3>
+                <div class="mb-3">
+                  <label class="form-label" for="category">Category *</label>
+                  <select class="form-select" id="category" name="category" required aria-describedby="category-error"><option value="">Choose a category</option></select>
+                  <div class="invalid-feedback" id="category-error"></div>
+                </div>
+                <div class="row g-3">
+                  <div class="col-sm-6">
+                    <label class="form-label" for="unitOfMeasure">Unit of measure *</label>
+                    <select class="form-select" id="unitOfMeasure" name="unitOfMeasure" required aria-describedby="unitOfMeasure-error"><option value="">Choose a unit</option></select>
+                    <div class="invalid-feedback" id="unitOfMeasure-error"></div>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label" for="price">Price (USD) *</label>
+                    <input class="form-control" type="number" id="price" name="price" min="0" max="99999.99" step="0.01" inputmode="decimal" required aria-describedby="price-error">
+                    <div class="invalid-feedback" id="price-error"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="save-actions">
+                <p class="save-hint" id="save-hint">All changes saved in this browser.</p>
+                <div class="button-row">
+                  <button class="btn btn-outline-secondary" id="discard-changes" type="button" disabled>Discard</button>
+                  <button class="btn btn-primary" id="save-changes" type="submit" disabled>Save changes</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <p class="catalog-footnote">Edits are saved in this browser. Use Download JSON to keep a file copy. Changes are not shared with other browsers.</p>
+      </section>
+    </div>
+  </main>
+  <footer class="container site-footer">The Community Hub · Community Blog · Group 1<br><span class="footer-note">Digital resources and prices are examples for our class project.</span></footer>
+
+  <dialog class="discard-dialog" id="discard-dialog" aria-labelledby="discard-title" aria-describedby="discard-description">
+    <h2 id="discard-title">Leave these changes?</h2>
+    <p id="discard-description" class="text-secondary">You have unsaved edits. Discard them to continue, or keep editing.</p>
+    <div class="button-row">
+      <button class="btn btn-outline-secondary" id="keep-editing" type="button" autofocus>Keep editing</button>
+      <button class="btn btn-primary" id="confirm-discard" type="button">Discard changes</button>
+    </div>
+  </dialog>
+</body>
+</html>
