@@ -104,7 +104,7 @@ registration/update. Tests used a temporary member data file.
 The managed browser preview could not start because of an environment permission
 error. Real-browser rendering, responsive layout, native dialog focus, and the
 native download interaction remain unverified. No page screenshots have been
-fabricated. See `L7_CHECKLIST_ZH.md` for the remaining visual checks and screenshots.
+fabricated. See `L7_CHECKLIST.md` for the remaining visual checks and screenshots.
 
 ## Design references
 
