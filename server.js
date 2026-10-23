@@ -49,8 +49,14 @@ function createServer({ dataFile = path.join(__dirname, 'data', 'members.json') 
       const filename = path.resolve(publicDirectory, '.' + (pathname === '/' ? '/index.html' : decodeURIComponent(pathname)));
       if (!filename.startsWith(publicDirectory + path.sep)) return reply(res, 403, { message: 'Access denied.' });
       if (!fs.existsSync(filename) || !fs.statSync(filename).isFile()) return reply(res, 404, { message: 'Page not found.' });
-      const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.txt': 'text/plain', '.json': 'application/json' };
-      res.writeHead(200, { 'Content-Type': (types[path.extname(filename)] || 'application/octet-stream') + '; charset=utf-8' });
+      const types = {
+        '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
+        '.js': 'text/javascript; charset=utf-8', '.txt': 'text/plain; charset=utf-8',
+        '.json': 'application/json; charset=utf-8', '.png': 'image/png',
+        '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp',
+        '.svg': 'image/svg+xml', '.gif': 'image/gif', '.ico': 'image/x-icon'
+      };
+      res.writeHead(200, { 'Content-Type': types[path.extname(filename).toLowerCase()] || 'application/octet-stream' });
       res.end(req.method === 'HEAD' ? undefined : fs.readFileSync(filename));
     } catch (error) {
       console.error(error.message);
