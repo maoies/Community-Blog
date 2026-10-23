@@ -49,7 +49,7 @@ function createServer({ dataFile = path.join(__dirname, 'data', 'members.json') 
       const filename = path.resolve(publicDirectory, '.' + (pathname === '/' ? '/index.html' : decodeURIComponent(pathname)));
       if (!filename.startsWith(publicDirectory + path.sep)) return reply(res, 403, { message: 'Access denied.' });
       if (!fs.existsSync(filename) || !fs.statSync(filename).isFile()) return reply(res, 404, { message: 'Page not found.' });
-      const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.txt': 'text/plain' };
+      const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.txt': 'text/plain', '.json': 'application/json' };
       res.writeHead(200, { 'Content-Type': (types[path.extname(filename)] || 'application/octet-stream') + '; charset=utf-8' });
       res.end(req.method === 'HEAD' ? undefined : fs.readFileSync(filename));
     } catch (error) {

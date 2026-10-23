@@ -1,0 +1,79 @@
+/* Product page styles reuse the existing Community Hub palette. */
+.products-main { padding-top: 38px; padding-bottom: 48px; }
+.products-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 28px; }
+.products-heading h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: clamp(30px, 3.2vw, 38px); letter-spacing: -0.6px; margin-bottom: 10px; }
+.products-heading > div { max-width: 650px; }
+.products-heading .btn { flex-shrink: 0; font-size: 14px; }
+.products-toolbar { justify-content: flex-end; flex-shrink: 0; gap: 8px; }
+.catalog-status { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+.catalog-status:empty { display: none; }
+.catalog-status.is-error { color: #a32d28; }
+.catalog-panel, .editor-panel { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 24px; min-width: 0; }
+.panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 24px; }
+.panel-heading h2 { font-size: 21px; margin-bottom: 0; }
+.resource-count { border-radius: 20px; background: #eff2e9; color: var(--ink); padding: 5px 10px; font-size: 12px; white-space: nowrap; }
+.search-row { display: flex; gap: 8px; }
+.search-row .form-control { min-width: 0; }
+.search-row .btn { font-size: 14px; padding-left: 16px; padding-right: 16px; }
+.products-main .form-select { border-color: #aab2aa; min-height: 46px; color: var(--ink); }
+.products-main .form-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px #bc462424; }
+.products-main .form-control.is-invalid, .products-main .form-select.is-invalid { border-color: #dc3545; }
+.results-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12px; padding-top: 20px; padding-bottom: 12px; }
+.clear-search { color: var(--accent); padding: 4px 0; background: transparent; border: 0; font-weight: 600; flex-shrink: 0; }
+.clear-search:hover { text-decoration: underline; }
+.clear-search:disabled { opacity: 0.5; }
+.product-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.product-choice { display: flex; width: 100%; align-items: center; gap: 12px; padding: 14px 12px; text-align: left; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: #fff; }
+.product-choice:hover { background: #faf8f1; border-color: #aab2aa; }
+.product-choice[aria-pressed="true"] { background: #f0f3eb; border-color: #7c8d73; box-shadow: inset 3px 0 #547047; }
+.resource-mark { flex-shrink: 0; width: 38px; height: 48px; border-radius: 3px 6px 6px 3px; background: #e4eadc; border-left: 3px solid #a7b399; display: grid; place-items: center; color: #41583b; font-family: Georgia, "Times New Roman", serif; font-size: 18px; }
+.resource-mark[data-category="Magazine"] { color: #874b32; background: #f4e5d8; border-color: #d2ac8f; }
+.resource-mark[data-category="Photography"] { color: #475f6b; background: #e2e9ec; border-color: #a0b3be; }
+.resource-mark[data-category="Community"] { color: #6d5570; background: #ece3ed; border-color: #bfacc1; }
+.product-choice-copy { flex: 1; min-width: 0; }
+.product-choice-name { display: block; font-size: 14px; line-height: 1.45; font-weight: 650; overflow-wrap: anywhere; }
+.product-choice-meta { display: block; font-size: 12px; line-height: 1.6; color: var(--muted); margin-top: 4px; }
+.product-choice-price { font-size: 14px; font-weight: 650; white-space: nowrap; }
+.empty-results, .editor-placeholder { border: 1px dashed var(--line); background: #fafbf7; border-radius: 7px; padding: 28px 20px; line-height: 1.7; font-size: 14px; }
+.catalog-footnote { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 14px 4px 0; }
+.editor-heading { align-items: flex-start; }
+.editor-heading h2 { line-height: 1.35; overflow-wrap: anywhere; }
+.edit-state { border-radius: 20px; background: #f1f2ed; color: #56634c; padding: 5px 9px; font-size: 11px; white-space: nowrap; }
+.edit-state.is-dirty { color: #7e4c13; background: #fff0d7; }
+.editor-section { border-top: 1px solid var(--line); padding-top: 22px; padding-bottom: 24px; }
+.editor-section h3 { display: flex; gap: 10px; font-size: 11px; color: var(--accent); align-items: baseline; margin-bottom: 18px; }
+.editor-section h3 span { color: var(--ink); font-size: 15px; font-weight: 650; }
+.products-main .product-id { background: #f5f6f1; font-family: ui-monospace, monospace; }
+.save-actions { border-top: 1px solid var(--line); padding-top: 20px; display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+.save-actions .btn { font-size: 14px; padding: 10px 16px; }
+.save-actions .button-row { flex-shrink: 0; gap: 8px; }
+.save-hint { color: var(--muted); font-size: 12px; line-height: 1.6; margin-bottom: 0; max-width: 180px; }
+.discard-dialog { padding: 28px; border: 1px solid var(--line); border-radius: 12px; max-width: 460px; width: calc(100% - 32px); color: var(--ink); }
+.discard-dialog::backdrop { background: #17271fc0; }
+.discard-dialog h2 { font-size: 24px; }
+.discard-dialog p { line-height: 1.7; }
+@media (max-width: 991.98px) {
+  .catalog-panel { padding: 22px; }
+}
+@media (max-width: 575.98px) {
+  .products-main { padding-top: 28px; padding-bottom: 32px; }
+  .products-heading { align-items: flex-start; flex-direction: column; gap: 18px; margin-bottom: 22px; }
+  .products-heading .products-toolbar { width: 100%; max-width: none; display: grid; grid-template-columns: 1.15fr 1fr; }
+  .products-toolbar .btn { padding-left: 10px; padding-right: 10px; }
+  .products-heading h1 { font-size: 32px; }
+  .products-heading p.text-secondary { font-size: 14px; line-height: 1.7; }
+  .catalog-panel, .editor-panel { padding: 18px; }
+  .panel-heading { gap: 10px; }
+  .panel-heading h2 { font-size: 19px; }
+  .product-choice { padding: 12px 10px; gap: 10px; }
+  .resource-mark { width: 30px; height: 42px; font-size: 16px; }
+  .product-choice-name, .product-choice-price { font-size: 13px; }
+  .product-choice-meta { font-size: 11px; }
+  .product-choice-meta span { display: block; }
+  .product-choice-meta .meta-dot { display: none; }
+  .edit-state { font-size: 10px; }
+  .products-main .form-select { font-size: 16px; }
+  .save-actions { align-items: stretch; flex-direction: column; }
+  .save-hint { max-width: none; }
+  .save-actions .button-row { display: grid; grid-template-columns: 1fr 1fr; }
+}
