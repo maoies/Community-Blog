@@ -1,0 +1,42 @@
+[
+  {
+    "productId": "P101",
+    "name": "Community Reading Guide",
+    "description": "Make a little room for reading. A digital guide with reading prompts, book club questions, and a simple reading journal.",
+    "category": "Reading",
+    "unitOfMeasure": "Download",
+    "price": 4.99
+  },
+  {
+    "productId": "P102",
+    "name": "The Everyday Journal",
+    "description": "Our monthly digital magazine brings together community stories about small discoveries, creative hobbies, and everyday life.",
+    "category": "Magazine",
+    "unitOfMeasure": "Issue",
+    "price": 7.99
+  },
+  {
+    "productId": "P103",
+    "name": "Neighborhood Photo Guide",
+    "description": "See familiar places in a new way. Explore simple phone photography tips and photo walk prompts for your neighborhood.",
+    "category": "Photography",
+    "unitOfMeasure": "Download",
+    "price": 3.99
+  },
+  {
+    "productId": "P104",
+    "name": "Book Club Starter Kit",
+    "description": "Bring a few readers together with a welcome checklist, discussion cards, and a printable plan for your first book club meeting.",
+    "category": "Reading",
+    "unitOfMeasure": "Bundle",
+    "price": 6.5
+  },
+  {
+    "productId": "P105",
+    "name": "Small Gatherings Resource Pack",
+    "description": "Plan an easy community gathering with invitation templates, a shared activity planner, and a checklist for a welcoming space.",
+    "category": "Community",
+    "unitOfMeasure": "Bundle",
+    "price": 5.99
+  }
+]
