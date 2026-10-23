@@ -143,4 +143,4 @@ Word → 导出或另存为 PDF。建议文件名 Group1_L07_Product_Management_
 
 17 组 Node HTTP / jsdom 集成检查通过，使用实际完整 jQuery 3.7.1。真实浏览器布局、原生弹窗焦点及下载交互尚未实测；需要在本机或 zyBooks 预览中复核。本包未含伪造截图或最终提交 PDF。
 
-当前 GitHub 连接只读，本地分支 frank-l7-products 尚未推送。合并时核对小组最新代码。
+2026-10-23：L07 代码已通过 frank-l7-update 分支的 PR #2 合并到 main。小组继续开发 L08 时，请先更新 main，再创建自己的开发分支。
