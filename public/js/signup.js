@@ -6,6 +6,7 @@ const cancelButton = document.getElementById('cancel-button');
 const fields = ['fullName', 'email', 'age', 'phone', 'address'];
 let editingId = null;
 let submitted = false;
+let formRevision = 0;
 
 async function request(url, options = {}) {
   const response = await fetch(url, options);
@@ -29,6 +30,7 @@ function setErrors(errors) {
 }
 
 function resetForm() {
+  formRevision++;
   form.reset();
   editingId = null;
   submitted = false;
@@ -58,6 +60,7 @@ async function loadMembers() {
       edit.className = 'btn btn-outline-secondary btn-sm';
       edit.textContent = 'Edit';
       edit.addEventListener('click', () => {
+        formRevision++;
         editingId = member.id;
         submitted = false;
         for (const name of fields) form.elements[name].value = member[name];
@@ -78,6 +81,7 @@ async function loadMembers() {
 }
 
 form.addEventListener('input', () => {
+  formRevision++;
   if (submitted) setErrors(MemberValidation.validateMember(Object.fromEntries(new FormData(form))).errors);
 });
 
@@ -92,18 +96,23 @@ form.addEventListener('submit', async (event) => {
     form.querySelector('.is-invalid').focus();
     return;
   }
+  const savedRevision = formRevision;
+  const memberId = editingId;
   submitButton.disabled = true;
   try {
-    await request(editingId ? `/api/members/${encodeURIComponent(editingId)}` : '/api/members', {
-      method: editingId ? 'PUT' : 'POST',
+    await request(memberId ? `/api/members/${encodeURIComponent(memberId)}` : '/api/members', {
+      method: memberId ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(member)
     });
-    showMessage(editingId ? 'Member updated successfully.' : 'Registration successful!', 'success');
-    resetForm();
+    // A previous save must not reset a newer draft or a different member.
+    if (formRevision === savedRevision) {
+      showMessage(memberId ? 'Member updated successfully.' : 'Registration successful!', 'success');
+      resetForm();
+    }
     await loadMembers();
   } catch (error) {
-    showMessage(error.message, 'danger');
+    if (formRevision === savedRevision) showMessage(error.message, 'danger');
   } finally { submitButton.disabled = false; }
 });
 
