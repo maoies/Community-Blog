@@ -252,6 +252,17 @@ test('server errors remain visible instead of silently switching to a different 
   assert.equal(app.hits.some((hit) => hit.path === '/data/products.json'), false);
 });
 
+test('explicit browser-demo mode loads the static seed without making an API request', async (t) => {
+  const app = await server(t, { staticOnly: true, apiFailure: true });
+  const p = await page(t, app.base, '/cart.html?demo=1');
+  await until(() => p.document.querySelectorAll('[data-add-id]').length === 5);
+  assert.equal(p.window.ProductCatalog.isShared(), false);
+  assert.match(p.document.querySelector('nav a.active').href, /demo=1/);
+  assert.equal(app.hits.some((hit) => hit.path.startsWith('/api/')), false);
+  p.click('[data-add-id="P101"]');
+  assert.equal(p.document.getElementById('summary-total').textContent, '$4.99');
+});
+
 test('all four pages link to the cart and all new page assets load', async (t) => {
   const app = await server(t);
   for (const name of ['index', 'signup', 'products', 'cart']) {
