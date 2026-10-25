@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Cart | The Community Hub</title>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/products.css">
+  <link rel="stylesheet" href="css/cart.css">
+  <script defer src="vendor/jquery-3.7.1.min.js"></script>
+  <script defer src="js/product-validation.js"></script>
+  <script defer src="js/product-catalog.js"></script>
+  <script defer src="js/cart-store.js"></script>
+  <script defer src="js/cart.js"></script>
+  <script defer src="js/navigation.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header">
+    <nav class="navbar container" aria-label="Main navigation">
+      <a class="navbar-brand" href="index.html">The Community Hub<span class="brand-dot" aria-hidden="true">.</span></a>
+      <div class="nav">
+        <a class="nav-link" href="index.html">Home</a>
+        <a class="nav-link" href="index.html#stories-title">Stories</a>
+        <a class="nav-link" href="products.html">Products</a>
+        <a class="nav-link active" href="cart.html" aria-current="page">Cart</a>
+        <a class="nav-link" href="signup.html">Sign Up</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container cart-main" id="main-content" tabindex="-1">
+    <div class="cart-heading">
+      <div>
+        <p class="eyebrow mb-2">THE COMMUNITY COLLECTION</p>
+        <h1>Your cart<span class="brand-dot">.</span></h1>
+        <p class="text-secondary mb-0">A little inspiration for your everyday. Keep the resources you love.</p>
+      </div>
+      <a class="manage-link" href="products.html">Manage the catalog <span aria-hidden="true">↗</span></a>
+    </div>
+    <noscript><p class="alert alert-warning">Enable JavaScript to search products and use your cart.</p></noscript>
+    <div class="alert d-none cart-feedback" id="cart-feedback" role="status" aria-live="polite">
+      <span id="cart-feedback-text"></span>
+      <button type="button" id="undo-remove" class="feedback-undo d-none">Undo removal</button>
+    </div>
+    <div class="alert alert-warning d-none" id="cart-storage-error" role="alert">
+      <p id="cart-storage-message" class="mb-2"></p>
+      <div class="button-row">
+        <button class="btn btn-outline-secondary btn-sm" id="retry-cart" type="button">Try again</button>
+        <button class="btn btn-outline-secondary btn-sm" id="reset-cart" type="button">Reset saved cart</button>
+      </div>
+    </div>
+
+    <div class="cart-layout">
+      <section class="cart-panel" aria-labelledby="cart-items-title">
+        <div class="cart-panel-heading">
+          <h2 id="cart-items-title">Selected resources <span class="resource-count" id="cart-item-count">0 items</span></h2>
+          <button class="clear-search" type="button" id="clear-cart" disabled>Clear cart</button>
+        </div>
+        <p class="cart-loading text-secondary" id="cart-loading" role="status">Loading your resources...</p>
+        <div class="cart-empty d-none" id="cart-empty">
+          <svg class="empty-book" viewBox="0 0 80 64" fill="none" aria-hidden="true">
+            <path d="M40 16C30 8 16 9 8 12v41c10-4 23-3 32 4 9-7 22-8 32-4V12c-8-3-22-4-32 4Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M40 17v39M16 22c5-1 11 0 16 2M16 31c5-1 11 0 16 2M48 24c5-2 11-3 16-2M48 33c5-2 11-3 16-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <h3>A good story starts here.</h3>
+          <p>Your cart is empty. Explore a guide, a magazine, or something to bring your community together.</p>
+          <a class="btn btn-primary" href="#browse-products">Explore the collection</a>
+        </div>
+        <ul class="cart-items" id="cart-items" aria-label="Items in your cart"></ul>
+        <div class="cart-panel-footer d-none" id="cart-panel-footer">
+          <span class="delivery-dot" aria-hidden="true"></span>
+          <p class="mb-0">Digital resources. A little less clutter, a little more possibility.</p>
+        </div>
+      </section>
+
+      <aside class="selection-summary" aria-labelledby="summary-title">
+        <p class="eyebrow mb-2">SOMETHING WORTH KEEPING</p>
+        <h2 id="summary-title">Your selection</h2>
+        <dl class="summary-lines">
+          <div><dt>Items</dt><dd id="summary-quantity">0</dd></div>
+          <div><dt>Subtotal</dt><dd id="summary-subtotal">$0.00</dd></div>
+          <div><dt>Format</dt><dd>Digital resources</dd></div>
+          <div class="summary-total"><dt>Total <span>(USD)</span></dt><dd id="summary-total">$0.00</dd></div>
+        </dl>
+        <p class="summary-note" id="summary-note">Add a resource to get started.</p>
+        <button class="btn btn-primary w-100" id="prepare-cart" type="button" disabled>Prepare cart data <span aria-hidden="true">→</span></button>
+        <a class="continue-link" href="#browse-products">Continue browsing</a>
+        <p class="demo-note">Class storefront demo. No order or payment is created.</p>
+      </aside>
+    </div>
+
+    <section class="browse-section" id="browse-products" aria-labelledby="browse-title">
+      <div class="browse-heading">
+        <div><p class="eyebrow mb-2">MADE FOR SMALL DISCOVERIES</p><h2 id="browse-title">Find your next good read.</h2></div>
+        <p class="text-secondary mb-0" id="browse-count">Loading collection</p>
+      </div>
+      <form class="browse-search" id="cart-search-form" role="search">
+        <div class="browse-search-input">
+          <label class="form-label" for="cart-query">Search resources</label>
+          <input class="form-control" id="cart-query" type="search" maxlength="80" placeholder="Search by name, ID, or description" disabled>
+        </div>
+        <div class="browse-category">
+          <label class="form-label" for="cart-category">Category</label>
+          <select class="form-select" id="cart-category" disabled><option value="">All categories</option></select>
+        </div>
+        <button class="btn btn-outline-secondary" type="submit" id="cart-search-button" disabled>Search</button>
+        <button class="clear-search" type="button" id="cart-clear-filters" disabled>Clear filters</button>
+      </form>
+      <p class="text-secondary browse-message" id="browse-message" role="status" aria-live="polite">Loading products...</p>
+      <button class="btn btn-outline-secondary d-none mb-3" id="retry-catalog" type="button">Reload collection</button>
+      <ul class="resource-grid" id="cart-product-list" aria-label="Resources to add to your cart"></ul>
+      <div class="empty-results d-none" id="cart-no-results"><h3 class="h5">Nothing matched this time.</h3><p class="mb-0 text-secondary">Try a different search, or clear your filters to see the collection.</p></div>
+    </section>
+  </main>
+  <footer class="container site-footer">The Community Hub · Community Blog · Group 1<br><span class="footer-note">Digital resources and prices are examples for our class project.</span></footer>
+
+  <dialog class="discard-dialog" id="clear-cart-dialog" aria-labelledby="clear-cart-title" aria-describedby="clear-cart-description">
+    <h2 id="clear-cart-title">Clear your cart?</h2>
+    <p id="clear-cart-description">All saved items will be removed from this browser's cart.</p>
+    <div class="button-row"><button type="button" class="btn btn-outline-secondary" id="keep-cart" autofocus>Keep my items</button><button type="button" class="btn btn-primary" id="confirm-clear-cart">Clear cart</button></div>
+  </dialog>
+  <dialog class="cart-preview-dialog" id="cart-preview-dialog" aria-labelledby="cart-preview-title" aria-describedby="cart-preview-description">
+    <div class="preview-heading"><div><p class="eyebrow mb-2">YOUR SELECTION, READY TO SHARE</p><h2 id="cart-preview-title">Cart JSON is ready.</h2></div><button class="preview-close" id="close-cart-preview" type="button" aria-label="Close cart data preview" autofocus>×</button></div>
+    <p class="text-secondary" id="cart-preview-description">A JSON copy of your selected resources. No order has been placed.</p>
+    <pre id="cart-json" tabindex="0" aria-label="Prepared shopping cart JSON"></pre>
+    <div class="button-row"><button type="button" class="btn btn-primary" id="download-cart-json">Download cart JSON</button><button type="button" class="btn btn-outline-secondary" id="back-to-cart">Back to cart</button></div>
+  </dialog>
+</body>
+</html>

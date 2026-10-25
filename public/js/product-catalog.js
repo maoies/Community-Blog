@@ -1,130 +1,134 @@
-/* Shared catalog for Product Details and the future L8 cart. Requires full jQuery. */
+/* Shared catalog: REST requests on the Node server; browser demo on static hosts. */
 'use strict';
-window.ProductCatalog = (function ($) {
+window.ProductCatalog = (function ($, rules) {
   const dataUrl = 'data/products.json';
+  const apiUrl = 'api/products';
   const storageKey = 'community-hub.product-changes.v1';
-  const categories = ['Reading', 'Magazine', 'Photography', 'Community'];
-  const units = ['Download', 'Issue', 'Bundle'];
+  const copy = (value) => JSON.parse(JSON.stringify(value));
   let originals = [];
   let products = [];
   let loaded = false;
+  let shared = false;
   let notice = '';
-  const copy = (value) => JSON.parse(JSON.stringify(value));
 
-  function validate(input, { creating = false } = {}) {
-    const errors = {};
-    const product = {};
-    for (const key of ['productId', 'name', 'description', 'category', 'unitOfMeasure']) {
-      product[key] = String(input?.[key] ?? '').trim();
-    }
-    if (!/^P\d{3}$/.test(product.productId)) errors.productId = 'Use an ID like P106 (P and three digits).';
-    else if (creating && loaded && getById(product.productId)) errors.productId = 'This product ID already exists. Choose a different ID.';
-    if (!product.name || product.name.length > 80) errors.name = 'Enter a product name (1-80 characters).';
-    if (!product.description || product.description.length > 500) {
-      errors.description = 'Enter a description (1-500 characters).';
-    }
-    if (!categories.includes(product.category)) errors.category = 'Choose a category.';
-    if (!units.includes(product.unitOfMeasure)) errors.unitOfMeasure = 'Choose a unit of measure.';
-    const priceText = String(input?.price ?? '').trim();
-    const price = Number(priceText);
-    if (priceText === '') errors.price = 'Price is required.';
-    else if (!Number.isFinite(price)) errors.price = 'Enter a valid price.';
-    else if (price < 0) errors.price = 'Price cannot be negative.';
-    else if (price > 99999.99) errors.price = 'Price cannot exceed $99,999.99.';
-    else if (!/^\d+(\.\d{1,2})?$/.test(priceText)) errors.price = 'Use a number with up to two decimal places.';
-    product.price = price;
-    return { product, errors, valid: Object.keys(errors).length === 0 };
+  function api(method, url, data) {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url, method, dataType: 'json', timeout: 10000, cache: false,
+        ...(data === undefined ? {} : {
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify(data), processData: false
+        })
+      }).done(resolve).fail(function (xhr) {
+        const error = new Error(xhr.responseJSON?.message || 'The product request could not be completed. Try again.');
+        error.status = xhr.status;
+        reject(error);
+      });
+    });
+  }
+
+  function normalize(list) {
+    if (!Array.isArray(list)) throw new Error('Product data must be a JSON array.');
+    const ids = new Set();
+    return list.map(function (input) {
+      const result = rules.validate(input);
+      if (!result.valid || ids.has(result.product.productId)) throw new Error('Invalid product data.');
+      ids.add(result.product.productId);
+      return result.product;
+    });
   }
 
   function readChanges() {
     const text = window.localStorage.getItem(storageKey);
-    if (!text) return {};
+    if (!text) return { changes: {}, deletedIds: [] };
     const saved = JSON.parse(text);
     if (saved?.version !== 1 || !Array.isArray(saved.products)) throw new Error('Invalid saved catalog.');
-    const changes = {};
-    for (const input of saved.products) {
-      const result = validate(input);
-      if (!result.valid || changes[result.product.productId]) throw new Error('Invalid saved product.');
-      changes[result.product.productId] = result.product;
+    const changes = Object.fromEntries(normalize(saved.products).map((product) => [product.productId, product]));
+    const deletedIds = saved.deletedIds || [];
+    if (!Array.isArray(deletedIds) || deletedIds.some((id) => !/^P\d{3}$/.test(id)) || new Set(deletedIds).size !== deletedIds.length) {
+      throw new Error('Invalid deleted products.');
     }
-    return changes;
+    return { changes, deletedIds };
   }
 
-  function combine(changes) {
-    const originalIds = new Set(originals.map((product) => product.productId));
-    return [
-      ...originals.map((product) => copy(changes[product.productId] || product)),
-      ...Object.values(changes).filter((product) => !originalIds.has(product.productId)).map(copy)
-    ];
+  function combine(state) {
+    const ids = new Set(originals.map((product) => product.productId));
+    return [...originals.map((product) => state.changes[product.productId] || product),
+      ...Object.values(state.changes).filter((product) => !ids.has(product.productId))]
+      .filter((product) => !state.deletedIds.includes(product.productId)).map(copy);
   }
 
-  function load() {
+  function persist(state) {
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify({
+        version: 1, products: Object.values(state.changes), deletedIds: state.deletedIds
+      }));
+    } catch {
+      throw new Error('Changes could not be saved. Allow site storage, then try again. Your draft is still in the form.');
+    }
+    products = combine(state);
+  }
+
+  function stateForSave() {
+    try { return readChanges(); }
+    catch { return { changes: {}, deletedIds: [] }; }
+  }
+
+  async function loadBrowserDemo() {
+    originals = normalize(await $.getJSON(dataUrl));
+    shared = false;
+    let state = { changes: {}, deletedIds: [] };
+    try { state = readChanges(); }
+    catch { notice = 'Saved changes could not be read. Showing the sample catalog. Saving replaces unreadable saved changes.'; }
+    products = combine(state);
+  }
+
+  async function load() {
     loaded = false;
-    return $.getJSON(dataUrl).then(function (data) {
-      if (!Array.isArray(data)) throw new Error('Product data must be a JSON array.');
-      const ids = new Set();
-      originals = data.map(function (input) {
-        const result = validate(input);
-        if (!result.valid || ids.has(result.product.productId)) throw new Error('Invalid product data.');
-        ids.add(result.product.productId);
-        return result.product;
-      });
-      let changes = {};
-      notice = '';
-      try { changes = readChanges(); }
-      catch {
-        notice = 'Saved changes could not be read. Showing the original catalog. Saving will replace unreadable saved changes.';
-      }
-      products = combine(changes);
+    notice = '';
+    if (new URLSearchParams(window.location.search).get('demo') === '1') {
+      // Explicit browser-demo mode also works on preview hosts without API routes.
+      await loadBrowserDemo();
       loaded = true;
       return getAll();
-    });
+    }
+    try {
+      // GET reads the shared product collection when the demonstration API is running.
+      products = normalize(await api('GET', apiUrl));
+      originals = copy(products);
+      shared = true;
+      try {
+        if (window.localStorage.getItem(storageKey)) notice = 'The project server supplies this shared catalog. Older browser-only edits remain stored in this browser.';
+      } catch { /* A shared catalog does not require browser product storage. */ }
+    } catch (error) {
+      // Only an absent endpoint selects static-demo mode. Server/network failures stay visible.
+      if (![404, 405].includes(error.status)) throw error;
+      await loadBrowserDemo();
+    }
+    loaded = true;
+    return getAll();
   }
 
   function getAll() {
     if (!loaded) throw new Error('Load the catalog first.');
     return copy(products);
   }
-
-  function getById(id) {
-    return getAll().find((product) => product.productId === id) || null;
-  }
-
+  const getById = (id) => getAll().find((product) => product.productId === id) || null;
   function search(query = '', category = '') {
-    const term = query.trim().toLowerCase();
-    return getAll().filter((product) =>
-      (!category || product.category === category) &&
-      (!term || product.productId.toLowerCase().includes(term) || product.name.toLowerCase().includes(term))
-    );
+    const term = String(query).trim().toLowerCase();
+    return getAll().filter((product) => (!category || product.category === category) &&
+      (!term || [product.productId, product.name, product.description].some((value) => value.toLowerCase().includes(term))));
   }
-
-  function persist(changes) {
-    // Persist first: a failed save must leave the displayed catalog unchanged.
-    try {
-      window.localStorage.setItem(storageKey, JSON.stringify({ version: 1, products: Object.values(changes) }));
-    } catch {
-      throw new Error('Changes could not be saved. Allow site storage in this browser, then try again. Your edits are still in the form.');
+  function validate(input, { creating = false } = {}) {
+    const result = rules.validate(input);
+    if (creating && loaded && getById(result.product.productId)) {
+      result.errors.productId = 'This product ID already exists. Choose a different ID.';
+      result.valid = false;
     }
-    products = combine(changes);
+    return result;
   }
-
-  function create(input) {
-    if (!loaded) throw new Error('Load the catalog first.');
-    const result = validate(input, { creating: true });
-    if (!result.valid) throw new Error(Object.values(result.errors)[0]);
-    let changes;
-    try { changes = readChanges(); }
-    catch { changes = {}; }
-    if (combine(changes).some((product) => product.productId === result.product.productId)) {
-      throw new Error('This product ID already exists. Choose a different ID.');
-    }
-    changes[result.product.productId] = result.product;
-    persist(changes);
-    return copy(result.product);
-  }
-
   function nextId() {
-    const used = new Set(getAll().map((product) => product.productId));
+    const used = new Set([...originals, ...getAll()].map((product) => product.productId));
     for (const [start, end] of [[101, 999], [1, 100]]) {
       for (let number = start; number <= end; number++) {
         const id = 'P' + String(number).padStart(3, '0');
@@ -133,28 +137,74 @@ window.ProductCatalog = (function ($) {
     }
     return '';
   }
-
-  function update(id, input, expectedProduct) {
-    if (!loaded || !getById(id)) throw new Error('Choose a product before saving.');
-    const result = validate({ ...input, productId: id });
-    if (!result.valid) throw new Error('Please check the highlighted fields.');
-    let changes;
-    try { changes = readChanges(); }
-    catch { changes = {}; }
-    const latest = combine(changes).find((product) => product.productId === id);
-    if (expectedProduct && JSON.stringify(latest) !== JSON.stringify(expectedProduct)) {
-      throw new Error('This product changed in another tab. Reload the page to review the latest version before saving.');
+  function assertExpected(latest, expected) {
+    if (!latest || (expected && JSON.stringify(latest) !== JSON.stringify(expected))) {
+      throw new Error('This product changed or was removed in another tab. Reload the catalog before saving.');
     }
-    changes[id] = result.product;
-    persist(changes);
+  }
+  async function create(input) {
+    if (!loaded) throw new Error('Load the catalog first.');
+    const result = validate(input, { creating: true });
+    if (!result.valid) throw new Error(Object.values(result.errors)[0]);
+    if (shared) {
+      // POST creates a new product from the validated form JSON.
+      const product = (await api('POST', apiUrl, result.product));
+      products.push(...normalize([product]));
+      return copy(product);
+    }
+    const state = stateForSave();
+    if (combine(state).some((product) => product.productId === result.product.productId)) throw new Error('This product ID already exists.');
+    state.deletedIds = state.deletedIds.filter((id) => id !== result.product.productId);
+    state.changes[result.product.productId] = result.product;
+    persist(state);
     return copy(result.product);
   }
-
-  const money = (price) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
+  async function update(id, input, expectedProduct) {
+    if (!loaded || !getById(id)) throw new Error('Choose a product before saving.');
+    const result = validate({ ...input, productId: id });
+    if (!result.valid) throw new Error(Object.values(result.errors)[0]);
+    if (shared) {
+      // PUT updates the product; the snapshot detects conflicting edits.
+      const product = (await api('PUT', apiUrl + '/' + encodeURIComponent(id), { ...result.product, expectedProduct }));
+      normalize([product]);
+      products = products.map((item) => item.productId === id ? product : item);
+      return copy(product);
+    }
+    const state = stateForSave();
+    assertExpected(combine(state).find((product) => product.productId === id), expectedProduct);
+    state.changes[id] = result.product;
+    persist(state);
+    return copy(result.product);
+  }
+  async function remove(id, expectedProduct) {
+    if (!loaded || !getById(id)) throw new Error('Choose a product before deleting.');
+    if (shared) {
+      // DELETE removes a product only after the page confirmation.
+      await api('DELETE', apiUrl + '/' + encodeURIComponent(id), { expectedProduct });
+      products = products.filter((product) => product.productId !== id);
+      return;
+    }
+    const state = stateForSave();
+    assertExpected(combine(state).find((product) => product.productId === id), expectedProduct);
+    delete state.changes[id];
+    if (!state.deletedIds.includes(id)) state.deletedIds.push(id);
+    persist(state);
+  }
+  async function prepareCart(document) {
+    if (!shared) return copy(document);
+    // The demo endpoint validates JSON transport without creating an order or payment.
+    const preview = await api('POST', 'api/cart/preview', {
+      items: document.items.map(({ productId, quantity }) => ({ productId, quantity }))
+    });
+    const checked = normalize(preview.items);
+    products = products.map((product) => checked.find((item) => item.productId === product.productId) || product);
+    return preview;
+  }
   return {
-    load, getAll, getById, search, create, nextId, update, validate, money,
-    categories: [...categories], units: [...units],
-    getNotice: () => notice,
+    load, getAll, getById, search, validate, nextId, create, update, remove, prepareCart,
+    categories: [...rules.categories], units: [...rules.units],
+    isShared: () => shared, getNotice: () => notice,
+    money: (price) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price),
     toJSON: () => JSON.stringify(getAll(), null, 2) + '\n'
   };
-})(window.jQuery);
+})(window.jQuery, window.ProductValidation);
