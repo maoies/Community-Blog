@@ -3,9 +3,14 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { randomUUID } = require('node:crypto');
 const { validateMember } = require('./public/js/validation');
+const { createProductHandler } = require('./lib/product-api');
 const publicDirectory = path.join(__dirname, 'public');
 
-function createServer({ dataFile = path.join(__dirname, 'data', 'members.json') } = {}) {
+function createServer({
+  dataFile = path.join(__dirname, 'data', 'members.json'),
+  productDataFile = path.join(__dirname, 'data', 'products.json')
+} = {}) {
+  const handleProducts = createProductHandler({ dataFile: productDataFile, seedFile: path.join(publicDirectory, 'data', 'products.json') });
   function readMembers() {
     const members = fs.existsSync(dataFile) ? JSON.parse(fs.readFileSync(dataFile, 'utf8')) : [];
     if (!Array.isArray(members)) throw new Error('Invalid member data.');
@@ -18,6 +23,7 @@ function createServer({ dataFile = path.join(__dirname, 'data', 'members.json') 
   return http.createServer(async (req, res) => {
     try {
       const pathname = new URL(req.url, 'http://localhost').pathname;
+      if (await handleProducts(req, res, pathname)) return;
       if (pathname === '/api/members' && req.method === 'GET') return reply(res, 200, readMembers());
       const item = pathname.match(/^\/api\/members\/([\w-]+)$/);
       if ((pathname === '/api/members' && req.method === 'POST') || (item && req.method === 'PUT')) {
