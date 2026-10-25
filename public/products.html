@@ -8,7 +8,9 @@
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/products.css">
   <script defer src="vendor/jquery-3.7.1.min.js"></script>
+  <script defer src="js/product-validation.js"></script>
   <script defer src="js/product-catalog.js"></script>
+  <script defer src="js/cart-store.js"></script>
   <script defer src="js/products.js"></script>
 </head>
 <body>
@@ -20,6 +22,7 @@
         <a class="nav-link" href="index.html">Home</a>
         <a class="nav-link" href="index.html#stories-title">Stories</a>
         <a class="nav-link active" href="products.html" aria-current="page">Products</a>
+        <a class="nav-link" href="cart.html">Cart</a>
         <a class="nav-link" href="signup.html">Sign Up</a>
       </div>
     </nav>
@@ -130,6 +133,10 @@
                   </div>
                 </div>
               </div>
+              <div class="product-secondary-actions">
+                <button class="btn btn-outline-secondary" id="add-product-to-cart" type="button" disabled>Add to cart</button>
+                <button class="delete-product-link" id="delete-product" type="button" disabled>Delete product</button>
+              </div>
               <div class="save-actions">
                 <p class="save-hint" id="save-hint">All changes saved in this browser.</p>
                 <div class="button-row">
@@ -140,11 +147,20 @@
             </form>
           </div>
         </div>
-        <p class="catalog-footnote">Edits are saved in this browser. Use Download JSON to keep a file copy. Changes are not shared with other browsers.</p>
+        <p class="catalog-footnote" id="catalog-storage-note">Loading catalog storage information...</p>
       </section>
     </div>
   </main>
   <footer class="container site-footer">The Community Hub · Community Blog · Group 1<br><span class="footer-note">Digital resources and prices are examples for our class project.</span></footer>
+
+  <dialog class="discard-dialog" id="delete-product-dialog" aria-labelledby="delete-product-title" aria-describedby="delete-product-description">
+    <h2 id="delete-product-title">Delete this product?</h2>
+    <p id="delete-product-description">Remove <strong id="delete-product-name"></strong> from the catalog? Existing carts will mark it unavailable.</p>
+    <div class="button-row">
+      <button class="btn btn-outline-secondary" id="cancel-delete-product" type="button" autofocus>Keep product</button>
+      <button class="btn btn-primary" id="confirm-delete-product" type="button">Delete product</button>
+    </div>
+  </dialog>
 
   <dialog class="discard-dialog" id="discard-dialog" aria-labelledby="discard-title" aria-describedby="discard-description">
     <h2 id="discard-title">Leave these changes?</h2>
