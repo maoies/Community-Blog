@@ -74,9 +74,24 @@ window.ProductCatalog = (function ($, rules) {
     catch { return { changes: {}, deletedIds: [] }; }
   }
 
+  async function loadBrowserDemo() {
+    originals = normalize(await $.getJSON(dataUrl));
+    shared = false;
+    let state = { changes: {}, deletedIds: [] };
+    try { state = readChanges(); }
+    catch { notice = 'Saved changes could not be read. Showing the sample catalog. Saving replaces unreadable saved changes.'; }
+    products = combine(state);
+  }
+
   async function load() {
     loaded = false;
     notice = '';
+    if (new URLSearchParams(window.location.search).get('demo') === '1') {
+      // Explicit browser-demo mode also works on preview hosts without API routes.
+      await loadBrowserDemo();
+      loaded = true;
+      return getAll();
+    }
     try {
       // GET reads the shared product collection when the demonstration API is running.
       products = normalize(await api('GET', apiUrl));
@@ -88,12 +103,7 @@ window.ProductCatalog = (function ($, rules) {
     } catch (error) {
       // Only an absent endpoint selects static-demo mode. Server/network failures stay visible.
       if (![404, 405].includes(error.status)) throw error;
-      originals = normalize(await $.getJSON(dataUrl));
-      shared = false;
-      let state = { changes: {}, deletedIds: [] };
-      try { state = readChanges(); }
-      catch { notice = 'Saved changes could not be read. Showing the sample catalog. Saving replaces unreadable saved changes.'; }
-      products = combine(state);
+      await loadBrowserDemo();
     }
     loaded = true;
     return getAll();
