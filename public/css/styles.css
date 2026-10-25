@@ -124,7 +124,8 @@ textarea.form-control { min-height: 90px; resize: vertical; }
   .container { padding-left: 20px; padding-right: 20px; }
   .site-header .navbar { justify-content: center; gap: 10px; padding-top: 14px; padding-bottom: 14px; }
   .navbar-brand { width: 100%; text-align: center; font-size: 21px; }
-  .nav-link { padding: 8px 10px; font-size: 14px; }
+  .site-header .nav { width: 100%; gap: 0; }
+  .nav-link { padding: 8px; font-size: 13px; }
   .home-main { padding-top: 24px; padding-bottom: 32px; }
   .home-intro { flex-direction: column; align-items: flex-start; gap: 18px; margin-bottom: 24px; }
   .featured-copy, .card-body, .about { padding: 22px; }
