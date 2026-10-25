@@ -1,9 +1,10 @@
 # The Community Hub
 
-An IST 256 Community Blog storefront with a homepage, member sign-up, and
-L7 product management for digital guides, magazines, and resource bundles.
+An IST 256 community storefront with a homepage, member management, product
+management, and a separate L08 shopping cart. All products are sample digital
+resources; no payment or real order is created.
 
-## Run the project
+## Run
 
 Use Node.js 18 or newer:
 
@@ -11,73 +12,99 @@ Use Node.js 18 or newer:
 npm start
 ```
 
-Open `http://localhost:3000/`. The navigation links to **Products** and
-**Sign Up**. Bootstrap and full jQuery 3.7.1 are bundled in `public/vendor/`;
-no dependency installation is needed to run the site.
+Open `http://localhost:3000/`. Choose **Products** to manage the catalog or
+**Cart** to browse resources and build a cart. Runtime dependencies are not
+required: Bootstrap and full jQuery 3.7.1 are bundled in `public/vendor/`.
 
-Use the HTTP server instead of opening HTML files directly. Product data loads
-through jQuery AJAX, and member registration uses the server API.
+## L08 behavior
 
-## Features
+- Search the product catalog by ID, name, or description, and filter by category.
+- Add resources, edit quantities (whole numbers 1–99), remove items, undo the
+  last removal, and confirm before clearing the entire cart.
+- Preserve pending quantity edits when another cart row changes. Validate
+  quantities inline and show success/error messages beside the relevant action.
+- Show per-item prices, line subtotals, item count, and total in USD. Arithmetic
+  uses integer cents. Unavailable products remain removable and block export.
+- Prepare and download a JSON document with complete product fields, quantity,
+  line subtotal, currency, and totals. The server recalculates prices when
+  checking the cart; preparing the document does not create an order.
+- Create, edit, and delete products from the product management page. Deletion
+  requires confirmation; unsaved drafts and overlapping saves are protected.
+- Responsive cart and catalog layouts, labeled controls, live status messages,
+  keyboard-accessible dialogs, and navigation between all four pages.
 
-- Separate product management page with ID/name search and a category filter.
-- Create and edit products with stable, unique IDs and field-level validation.
-- Product ID, name, description, category, unit of measure, and numeric USD price.
-- Browser storage, JSON export, save feedback, and unsaved-change confirmation.
-- Loading, empty, no-results, retry, and storage-error states.
-- Member registration and editing, including protection for newer drafts when
-  an earlier save is still pending.
-- Responsive navigation and layouts; a scrollable member table on small screens.
+## AJAX and data
 
-## Product data and sharing
+`public/js/product-catalog.js` uses `$.ajax()` with JSON request bodies and these
+HTTP methods. The included Node demonstration API makes them executable now;
+the endpoints can be replaced with the group's later backend.
 
-`public/data/products.json` is the shared starting catalog. Product saves update
-the current browser's localStorage and visible list. They do not update the
-repository or another browser. This is the L7 storage design; a shared product
-backend and shopping cart are future work.
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/api/products` | Read the product collection |
+| POST | `/api/products` | Create a validated product |
+| PUT | `/api/products/P101` | Update a product with conflict detection |
+| DELETE | `/api/products/P101` | Delete a product after confirmation |
+| POST | `/api/cart/preview` | Validate cart JSON and return current prices/totals |
 
-To share catalog changes with the group:
+Products contain `productId`, `description`, `category`, `unitOfMeasure`, and
+numeric `price`; a `name` is included for display. Shared validation rules are
+in `public/js/product-validation.js`. Both the browser and API validate input.
 
-1. Save or discard the current draft, then select **Download JSON**.
-2. Review the exported product records and replace
-   `public/data/products.json` in the repository with that export.
-3. Commit the updated JSON so teammates can get the same starting catalog.
-4. An existing browser may still apply its own saved product changes. Export
-   any changes you need before clearing that site's saved data to load only
-   the newly shared catalog.
+`public/data/products.json` is the tracked seed catalog. The Node server creates
+`data/products.json` on the first product write and persists subsequent changes
+there. This runtime file is ignored by Git. Other browsers using the same server
+see the shared catalog when they load a page. Member data remains separate in
+`data/members.json`. Carts belong to individual browsers and use localStorage.
 
-Member records are stored separately in `data/members.json` by the existing
-member API. Automated tests use temporary data and leave that file unchanged.
+If hosting only static files (including a static classroom workspace), an absent
+product endpoint selects the browser demonstration mode. It loads the seed JSON
+using jQuery and saves product changes/deletions locally. The product page and
+cart preview identify this mode. Run `npm start` to exercise real HTTP writes and
+shared product storage. Network/server errors do not silently select a different
+catalog. Older L07 browser-only product edits are retained, but are not silently
+published to the shared server catalog.
 
-## Main files
+Preview hosts that do not implement API routes can use `cart.html?demo=1` or
+`products.html?demo=1` to explicitly select browser-only demonstration mode.
+This mode makes no product API requests and does not publish browser edits.
 
-| File | Purpose |
+## Files
+
+| Files | Responsibility |
 | --- | --- |
-| `public/index.html` | Storefront homepage and navigation |
-| `public/signup.html`, `public/js/signup.js` | Member form, validation feedback, and asynchronous saves |
-| `public/products.html`, `public/js/products.js` | Product search and editor interactions |
-| `public/js/product-catalog.js` | jQuery loading, catalog search, validation, storage, and JSON export |
-| `public/data/products.json` | Shared sample catalog |
-| `public/css/` | Shared and product-page styles |
-| `public/images/slow-reading-v2.svg` | Optimized homepage image with embedded WebP data |
-| `server.js` | Static files with appropriate MIME types and the member API |
-| `tests/regression.test.js` | Automated regression checks |
+| `public/cart.html`, `public/css/cart.css` | Shopping cart structure, responsive styling and dialogs |
+| `public/js/cart-store.js`, `public/js/cart.js` | Cart state, validation, totals, jQuery search, interactions and export |
+| `public/products.html`, `public/css/products.css`, `public/js/products.js` | Product form, list, delete confirmation and add-to-cart entry |
+| `public/js/product-catalog.js`, `public/js/product-validation.js` | Shared catalog, AJAX methods and validation |
+| `public/js/navigation.js` | Preserve explicit static demo mode between pages |
+| `lib/product-api.js`, `server.js` | Demonstration REST endpoints and JSON persistence |
+| `public/data/products.json` | Product JSON document with the required fields |
+| `tests/l08.test.js`, `tests/regression.test.js` | L08 checks and existing member/L07 regressions |
 
-## Tests
+The product controller and cart controller both use `ProductCatalog` and
+`CommunityCart`. `cart-items`, `cart-product-list`, `summary-total`, and
+`cart-json` are the cart's main rendering targets. The product form's field IDs
+match the JSON property names.
 
-Install the locked development dependencies, then run the included checks:
+## Test
 
 ```sh
 npm ci
 npm test
 ```
 
-The Node test runner and jsdom check delayed member saves, draft preservation,
-save errors and retries, duplicate submissions, member API behavior, image MIME
-types, HEAD responses, page assets, and L7 catalog loading/search/validation/
-creation/editing/restoration with the bundled jQuery library.
+The tests cover real jQuery/HTTP requests, CRUD, validation errors and successes,
+cart updates and totals, persistence, unavailable products, stale edits,
+static-host fallback, failed storage, navigation/assets, and member regressions.
+They use temporary member/product files and do not modify the seed catalog.
+All 21 automated tests passed. Separate desktop and mobile browser checks
+covered cart layout, quantity errors and updates, dialog focus and Escape,
+prepared JSON values, and product form creation/deletion. Native download
+completion could not be confirmed by the browser automation interface.
 
-Browser checks covered the homepage, product page, and member form at 375 px,
-and native discard-dialog focus, Escape, and discard behavior.
-The JSON export data passed automated checks. Native download completion could
-not be confirmed through the browser automation interface.
+## Design references
+
+- [Shopify cart template patterns](https://shopify.dev/docs/storefronts/themes/architecture/templates/cart): line items, quantity updates, removal and summaries.
+- [Bootstrap validation](https://getbootstrap.com/docs/5.3/forms/validation/): labeled controls and visible field feedback.
+- [jQuery AJAX](https://api.jquery.com/jQuery.ajax/): HTTP methods and JSON request/response handling.
