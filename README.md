@@ -1,9 +1,10 @@
-# The Community Hub
+# The Community Hub — L09
 
-An IST 256 Community Blog storefront with a homepage, member sign-up, and
-L7 product management for digital guides, magazines, and resource bundles.
+An IST 256 Community Blog project with an Options / Finalization page for
+confirming digital resources and choosing access and reading preferences.
+All products are sample digital resources; no payment or real order is created.
 
-## Run the project
+## Run
 
 Use Node.js 18 or newer:
 
@@ -11,73 +12,113 @@ Use Node.js 18 or newer:
 npm start
 ```
 
-Open `http://localhost:3000/`. The navigation links to **Products** and
-**Sign Up**. Bootstrap and full jQuery 3.7.1 are bundled in `public/vendor/`;
-no dependency installation is needed to run the site.
+Open `http://localhost:3000/`. Choose **Products** to manage the catalog or
+**Cart** to browse resources and build a cart. Choose **Preferences** for the L09
+Options / Finalization page, or open `http://localhost:3000/finalization.html`.
+The delivered version runs without installing packages: Bootstrap and jQuery
+are bundled in `public/vendor/`, and React is included in the generated local
+`public/js/finalization.bundle.js` file.
 
-Use the HTTP server instead of opening HTML files directly. Product data loads
-through jQuery AJAX, and member registration uses the server API.
+## L09 additions — Options / Finalization
 
-## Features
+L09 continues the Community Blog theme by letting users confirm their digital
+resource selections and choose access and reading preferences. The existing
+folder structure and pages are retained. New code is placed in `data`,
+`lib`, `public`, and `tests`.
 
-- Separate product management page with ID/name search and a category filter.
-- Create and edit products with stable, unique IDs and field-level validation.
-- Product ID, name, description, category, unit of measure, and numeric USD price.
-- Browser storage, JSON export, save feedback, and unsaved-change confirmation.
-- Loading, empty, no-results, retry, and storage-error states.
-- Member registration and editing, including protection for newer drafts when
-  an earlier save is still pending.
-- Responsive navigation and layouts; a scrollable member table on small screens.
+### New page and behavior
 
-## Product data and sharing
+- Added `public/finalization.html`, accessible through **Preferences** in the
+  navigation on every page and **Continue to preferences** in the shopping cart.
+- Carry saved cart resource IDs and quantities into the form. Users may also
+  select resources directly on the preferences page.
+- Collect full name, email, access method (download link, email link, or both),
+  reading format (PDF or online reading), notification frequency (none, weekly,
+  or monthly), optional notes, and confirmation that the selections were reviewed.
+- Validate required fields, email format, allowed option values, notes length,
+  resource selections, quantities, and the review confirmation in JavaScript.
+- Use React components and state to update the selected resources, catalog value,
+  and preference summary without reloading the page.
+- Use jQuery AJAX to load the existing product catalog and send the form as a
+  JSON document to the REST API.
+- Save confirmed options in `data/finalizations.json` and display the returned
+  confirmation ID, resource summary, preferences, and saved JSON.
+- **Reload saved confirmation** retrieves the persisted record through a GET
+  request. Failed submissions keep the form available for correction or retry.
+- Preserve the existing CSS palette and use Bootstrap form controls and grids
+  for a consistent, responsive page.
 
-`public/data/products.json` is the shared starting catalog. Product saves update
-the current browser's localStorage and visible list. They do not update the
-repository or another browser. This is the L7 storage design; a shared product
-backend and shopping cart are future work.
+This classroom feature records preferences only. It does not process payments,
+send emails, or deliver actual resources.
 
-To share catalog changes with the group:
-
-1. Save or discard the current draft, then select **Download JSON**.
-2. Review the exported product records and replace
-   `public/data/products.json` in the repository with that export.
-3. Commit the updated JSON so teammates can get the same starting catalog.
-4. An existing browser may still apply its own saved product changes. Export
-   any changes you need before clearing that site's saved data to load only
-   the newly shared catalog.
-
-Member records are stored separately in `data/members.json` by the existing
-member API. Automated tests use temporary data and leave that file unchanged.
-
-## Main files
+### L09 code files
 
 | File | Purpose |
 | --- | --- |
-| `public/index.html` | Storefront homepage and navigation |
-| `public/signup.html`, `public/js/signup.js` | Member form, validation feedback, and asynchronous saves |
-| `public/products.html`, `public/js/products.js` | Product search and editor interactions |
-| `public/js/product-catalog.js` | jQuery loading, catalog search, validation, storage, and JSON export |
-| `public/data/products.json` | Shared sample catalog |
-| `public/css/` | Shared and product-page styles |
-| `public/images/slow-reading-v2.svg` | Optimized homepage image with embedded WebP data |
-| `server.js` | Static files with appropriate MIME types and the member API |
-| `tests/regression.test.js` | Automated regression checks |
+| `public/finalization.html` | Page structure, navigation, and React mounting point |
+| `public/css/finalization.css` | Preferences form, summary, confirmation, and responsive styling |
+| `public/js/finalization.jsx` | Editable React components, form state, validation feedback, and dynamic rendering |
+| `public/js/finalization-api.js` | jQuery AJAX service calls used by React |
+| `public/js/finalization-validation.js` | Validation rules shared by the browser and server |
+| `public/js/finalization.bundle.js` | Generated browser bundle including React and React DOM |
+| `lib/finalization-api.js` | REST handler, server validation, and JSON persistence |
+| `lib/build-finalization.js` | Build the React source into the local browser bundle |
+| `data/finalizations.json` | Collection of saved finalization records; initially an empty array |
+| `tests/l09.test.js` | Finalization API, validation, persistence, and retry tests |
 
-## Tests
+The existing `server.js` registers the new handler. The existing pages gain a
+Preferences navigation link, and `cart.html` gains the continuation link.
+`package.json` and `package-lock.json` include React, React DOM, esbuild, and the
+build command. The React library license is in `public/vendor/REACT-LICENSE.txt`.
 
-Install the locked development dependencies, then run the included checks:
+### L09 REST API and JSON storage
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/api/products` | Read the existing resource catalog |
+| POST | `/api/finalizations` | Validate and save the submitted options document |
+| GET | `/api/finalizations` | Read the saved confirmation collection |
+| GET | `/api/finalizations/:id` | Read one saved confirmation |
+
+The POST sends `application/json`. The server validates the fields, checks that
+resources still exist, and recalculates values using current catalog prices.
+It returns HTTP 201 and saves a record containing `id`, `requestId`,
+`schemaVersion`, `status`, `createdAt`, `options`, and `selection`.
+An identical retry with the same request ID returns the existing record instead
+of creating a duplicate. Member and product storage remain separate.
+
+The L09 page requires the Node server for real AJAX and file storage. The older
+static-only catalog demo mode does not save finalization records.
+
+### Editing and building L09
+
+Run the delivered site with `npm start` or `node server.js`. To change the React
+source, edit `public/js/finalization.jsx` or `public/js/finalization-api.js`, then:
 
 ```sh
 npm ci
+npm run build
 npm test
 ```
 
-The Node test runner and jsdom check delayed member saves, draft preservation,
-save errors and retries, duplicate submissions, member API behavior, image MIME
-types, HEAD responses, page assets, and L7 catalog loading/search/validation/
-creation/editing/restoration with the bundled jQuery library.
+`npm run build` regenerates `public/js/finalization.bundle.js`. Keep both the
+editable source and generated bundle in the project. Changes to HTML, CSS,
+shared validation, or the Node handler do not require rebuilding the React
+bundle; restart the server after changes to its handlers.
 
-Browser checks covered the homepage, product page, and member form at 375 px,
-and native discard-dialog focus, Escape, and discard behavior.
-The JSON export data passed automated checks. Native download completion could
-not be confirmed through the browser automation interface.
+## L09 verification
+
+The five finalization tests in `tests/l09.test.js` cover field validation,
+server-calculated values, saved JSON, persistence after restart, duplicate
+retries, concurrent submissions, catalog changes, storage errors, navigation,
+and local assets. All 26 project tests passed after integration.
+
+Separate browser checks verified cart selections, React state, inline errors,
+JSON AJAX transport, saved confirmation retrieval, retry after a lost response,
+removed-resource recovery, and responsive layout.
+
+## References
+
+- [React createRoot](https://react.dev/reference/react-dom/client/createRoot)
+- [jQuery AJAX](https://api.jquery.com/jQuery.ajax/)
+- [Bootstrap forms](https://getbootstrap.com/docs/5.3/forms/overview/)

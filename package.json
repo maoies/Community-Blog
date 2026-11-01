@@ -5,12 +5,18 @@
   "description": "Simple community blog with member sign-up and JSON storage",
   "scripts": {
     "start": "node server.js",
+    "build": "node lib/build-finalization.js",
     "test": "node --test"
   },
   "engines": {
     "node": ">=18"
   },
   "devDependencies": {
+    "esbuild": "0.25.12",
     "jsdom": "26.1.0"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   }
 }
