@@ -3,6 +3,9 @@
   "contribution_review": "pending_member_confirmation",
   "screenshots": 23,
   "capturedAt": "2026-11-04T17:55:47.316Z",
-  "github_upload": "not_performed_connection_returned_403",
+  "github_upload": "uploaded_and_verified",
+  "github_branch": "frank-l10-workflow",
+  "github_source_commit": "c1fdada34fb6d31b652ec1603fce158e4a23cf38",
+  "github_url": "https://github.com/maoies/Community-Blog/tree/frank-l10-workflow",
   "canvas_submission": "not_performed"
 }
