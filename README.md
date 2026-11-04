@@ -1,3 +1,9 @@
+# L10: Community submission, moderation, billing and returns
+
+See [L10_README.md](L10_README.md) for current run and verification instructions.
+
+---
+
 # The Community Hub — L09
 
 An IST 256 Community Blog project with an Options / Finalization page for

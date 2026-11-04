@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en" ng-strict-di>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Review your selected resources and add your billing details. Digital delivery keeps your collection close at hand."><title>Billing Details | The Community Hub</title>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css"><link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/l10.css">
+  <script defer src="vendor/jquery-3.7.1.min.js"></script><script defer src="vendor/angular-1.8.3.min.js"></script>
+  <script defer src="js/cart-store.js"></script><script defer src="js/l10-validation.js"></script><script defer src="js/l10-app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header"><nav class="navbar container" aria-label="Main navigation">
+    <a class="navbar-brand" href="index.html">The Community Hub<span class="brand-dot" aria-hidden="true">.</span></a>
+    <div class="nav"><a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link" href="products.html">Resources</a>
+      <a class="nav-link" href="cart.html">Cart</a>
+      <a class="nav-link" href="finalization.html">Preferences</a>
+      <a class="nav-link" href="submission.html">Submit</a>
+      <a class="nav-link" href="approval.html">Review</a>
+      <a class="nav-link active" href="billing.html" aria-current="page">Billing</a>
+      <a class="nav-link" href="returns.html">Returns</a>
+      <a class="nav-link" href="signup.html">Sign Up</a></div>
+  </nav></header>
+  <main class="container workflow-main" id="main-content" tabindex="-1" ng-controller="BillingController as vm">
+    <div class="workflow-heading"><p class="eyebrow">YOUR COMMUNITY COLLECTION</p><h1>One last step to your next discovery<span class="brand-dot">.</span></h1><p class="lead-copy">Review your selected resources and add your billing details. Digital delivery keeps your collection close at hand.</p></div>
+    <noscript><p class="alert alert-warning">Enable JavaScript to use this page.</p></noscript>
+    <div ng-cloak>
+      <div id="form-feedback" tabindex="-1" class="alert" ng-if="vm.flash" ng-class="'alert-' + vm.flash.type" ng-attr-role="{{vm.flash.type === 'danger' ? 'alert' : 'status'}}" ng-bind="vm.flash.text"></div>
+
+      <section class="workflow-panel confirmation" ng-if="vm.saved" aria-labelledby="billing-success"><span class="confirmation-icon" aria-hidden="true">✓</span><p class="panel-kicker">DEMONSTRATION CONFIRMED</p><h2 id="billing-success">Your billing details are saved.</h2><p>Keep this order number to request a return.</p><p class="confirmation-code" ng-bind="vm.saved.id"></p><span class="status-pill demo_confirmed">Demo confirmed</span><div class="summary-line total"><span>Order total</span><span>{{vm.saved.total | currency:'$':2}}</span></div><p class="field-help mt-3">Demonstration card ending {{vm.saved.payment.last4}} · Digital delivery · No charge was made.</p><div class="workflow-actions"><a class="btn btn-primary" ng-href="returns.html?order={{vm.saved.id}}">Request a return</a><a class="btn btn-outline-secondary" href="cart.html">Back to cart</a></div><details class="json-details"><summary>View saved billing JSON</summary><pre ng-bind="vm.pretty(vm.saved)"></pre></details></section>
+      <div ng-if="!vm.saved"><p class="workflow-note">This is a course demonstration. Use the sample details below and a fictional address. No payment will be taken.</p>
+        <p class="workflow-loader" role="status" ng-if="!vm.loaded && !vm.flash">Loading your cart...</p>
+        <div class="empty-panel" ng-if="vm.loaded && !vm.items.length"><h2>Your collection is waiting.</h2><p class="text-secondary">Add resources to your cart before entering billing details.</p><div class="workflow-actions justify-content-center"><a class="btn btn-primary" href="cart.html">Browse resources</a><button type="button" class="btn btn-outline-secondary" ng-click="vm.addSample()">Add two sample resources</button></div></div>
+        <div class="workflow-actions mb-4" ng-if="!vm.loaded && vm.flash"><button type="button" class="btn btn-outline-secondary" ng-click="vm.load()">Reload summary</button><a href="cart.html" class="quiet-link">Review your cart</a></div>
+        <div class="workflow-layout" ng-if="vm.loaded && vm.items.length"><section class="workflow-panel"><form id="billing-form" ng-submit="vm.submit()" novalidate>
+          <fieldset class="form-section"><legend>01 / Billing address</legend><div class="form-grid">
+            <div class="wide"><label class="form-label" for="fullName">Full name</label>
+<input class="form-control" id="fullName" name="fullName" type="text" ng-model="vm.form.fullName" ng-change="vm.clear('fullName')" ng-class="{'is-invalid':vm.errors.fullName}" ng-attr-aria-invalid="{{!!vm.errors.fullName}}" aria-describedby="fullName-help fullName-error" maxlength="80" autocomplete="name">
+<span id="fullName-help"></span>
+<p class="field-error" id="fullName-error" ng-if="vm.errors.fullName" ng-bind="vm.errors.fullName"></p></div>
+            <div class="wide"><label class="form-label" for="email">Email for digital delivery</label>
+<input class="form-control" id="email" name="email" type="email" ng-model="vm.form.email" ng-change="vm.clear('email')" ng-class="{'is-invalid':vm.errors.email}" ng-attr-aria-invalid="{{!!vm.errors.email}}" aria-describedby="email-help email-error" maxlength="254" autocomplete="email">
+<span id="email-help"></span>
+<p class="field-error" id="email-error" ng-if="vm.errors.email" ng-bind="vm.errors.email"></p></div>
+            <div class="wide"><label class="form-label" for="line1">Street address</label>
+<input class="form-control" id="line1" name="line1" type="text" ng-model="vm.form.address.line1" ng-change="vm.clear('line1')" ng-class="{'is-invalid':vm.errors.line1}" ng-attr-aria-invalid="{{!!vm.errors.line1}}" aria-describedby="line1-help line1-error" maxlength="120" autocomplete="address-line1">
+<span id="line1-help"></span>
+<p class="field-error" id="line1-error" ng-if="vm.errors.line1" ng-bind="vm.errors.line1"></p></div>
+            <div class="wide"><label class="form-label" for="line2">Apartment, suite or unit <span class="optional-label">(optional)</span></label>
+<input class="form-control" id="line2" name="line2" type="text" ng-model="vm.form.address.line2" ng-change="vm.clear('line2')" ng-class="{'is-invalid':vm.errors.line2}" ng-attr-aria-invalid="{{!!vm.errors.line2}}" aria-describedby="line2-help line2-error" maxlength="120" autocomplete="address-line2">
+<span id="line2-help"></span>
+<p class="field-error" id="line2-error" ng-if="vm.errors.line2" ng-bind="vm.errors.line2"></p></div>
+            <div class=""><label class="form-label" for="city">City</label>
+<input class="form-control" id="city" name="city" type="text" ng-model="vm.form.address.city" ng-change="vm.clear('city')" ng-class="{'is-invalid':vm.errors.city}" ng-attr-aria-invalid="{{!!vm.errors.city}}" aria-describedby="city-help city-error" maxlength="80" autocomplete="address-level2">
+<span id="city-help"></span>
+<p class="field-error" id="city-error" ng-if="vm.errors.city" ng-bind="vm.errors.city"></p></div>
+            <div class=""><label class="form-label" for="region">State or region</label>
+<input class="form-control" id="region" name="region" type="text" ng-model="vm.form.address.region" ng-change="vm.clear('region')" ng-class="{'is-invalid':vm.errors.region}" ng-attr-aria-invalid="{{!!vm.errors.region}}" aria-describedby="region-help region-error" maxlength="80" autocomplete="address-level1">
+<span id="region-help"></span>
+<p class="field-error" id="region-error" ng-if="vm.errors.region" ng-bind="vm.errors.region"></p></div>
+            <div class=""><label class="form-label" for="postalCode">ZIP or postal code</label>
+<input class="form-control" id="postalCode" name="postalCode" type="text" ng-model="vm.form.address.postalCode" ng-change="vm.clear('postalCode')" ng-class="{'is-invalid':vm.errors.postalCode}" ng-attr-aria-invalid="{{!!vm.errors.postalCode}}" aria-describedby="postalCode-help postalCode-error" maxlength="16" autocomplete="postal-code">
+<span id="postalCode-help"></span>
+<p class="field-error" id="postalCode-error" ng-if="vm.errors.postalCode" ng-bind="vm.errors.postalCode"></p></div>
+            <div class=""><label class="form-label" for="country">Country</label>
+<select class="form-select" id="country" name="country" ng-model="vm.form.address.country" ng-options="option for option in vm.countries" ng-change="vm.clear('country')" ng-class="{'is-invalid':vm.errors.country}" ng-attr-aria-invalid="{{!!vm.errors.country}}" aria-describedby="country-error"><option value="">Choose an option</option></select>
+<p class="field-error" id="country-error" ng-if="vm.errors.country" ng-bind="vm.errors.country"></p></div>
+          </div></fieldset>
+          <fieldset class="form-section"><legend>02 / Demonstration payment</legend><button type="button" class="btn btn-outline-secondary btn-sm mb-3" ng-click="vm.useDemoDetails()">Use demonstration details</button><div class="form-grid">
+            <div class="wide"><label class="form-label" for="cardNumber">Demonstration card number</label>
+<input class="form-control" id="cardNumber" name="cardNumber" type="text" ng-model="vm.form.payment.cardNumber" ng-change="vm.clear('cardNumber')" ng-class="{'is-invalid':vm.errors.cardNumber}" ng-attr-aria-invalid="{{!!vm.errors.cardNumber}}" aria-describedby="cardNumber-help cardNumber-error" maxlength="23" inputmode="numeric" autocomplete="off">
+<p class="field-help" id="cardNumber-help">Sample only: 4242 4242 4242 4242.</p>
+<p class="field-error" id="cardNumber-error" ng-if="vm.errors.cardNumber" ng-bind="vm.errors.cardNumber"></p></div>
+            <div class=""><label class="form-label" for="expiration">Expiration</label>
+<input class="form-control" id="expiration" name="expiration" type="text" ng-model="vm.form.payment.expiration" ng-change="vm.clear('expiration')" ng-class="{'is-invalid':vm.errors.expiration}" ng-attr-aria-invalid="{{!!vm.errors.expiration}}" aria-describedby="expiration-help expiration-error" maxlength="5" placeholder="MM/YY" inputmode="numeric" autocomplete="off">
+<span id="expiration-help"></span>
+<p class="field-error" id="expiration-error" ng-if="vm.errors.expiration" ng-bind="vm.errors.expiration"></p></div>
+            <div class=""><label class="form-label" for="securityCode">Security code</label>
+<input class="form-control" id="securityCode" name="securityCode" type="password" ng-model="vm.form.payment.securityCode" ng-change="vm.clear('securityCode')" ng-class="{'is-invalid':vm.errors.securityCode}" ng-attr-aria-invalid="{{!!vm.errors.securityCode}}" aria-describedby="securityCode-help securityCode-error" maxlength="4" inputmode="numeric" autocomplete="off">
+<p class="field-help" id="securityCode-help">Use the sample value 123.</p>
+<p class="field-error" id="securityCode-error" ng-if="vm.errors.securityCode" ng-bind="vm.errors.securityCode"></p></div>
+          </div></fieldset>
+          <p class="field-error" id="items-error" ng-if="vm.errors.items" ng-bind="vm.errors.items"></p><div class="workflow-actions"><button class="btn btn-primary" type="submit" ng-disabled="vm.busy">{{vm.busy ? 'Saving...' : 'Submit billing details'}}</button><a class="quiet-link" href="cart.html">Edit cart</a></div><details class="json-details"><summary>Preview billing JSON (payment masked)</summary><pre ng-bind="vm.redactedJSON()"></pre></details>
+        </form></section><aside class="workflow-panel order-summary" aria-labelledby="summary-title"><p class="panel-kicker">YOUR NEXT LITTLE DISCOVERY</p><h2 id="summary-title">Order summary <span class="text-secondary small">({{vm.itemCount()}})</span></h2>
+          <ul class="summary-items"><li class="summary-item" ng-repeat="item in vm.items track by item.productId"><img ng-src="{{vm.image(item.productId)}}" ng-attr-alt="{{item.name + ' cover'}}"><div><strong ng-bind="item.name"></strong><small>Qty {{item.quantity}} · {{item.price | currency:'$':2}} each</small></div><span class="summary-price">{{item.price * item.quantity | currency:'$':2}}</span></li></ul>
+          <div class="summary-line"><span>Subtotal</span><span>{{vm.total() | currency:'$':2}}</span></div><div class="summary-line"><span>Digital delivery</span><span>$0.00</span></div><div class="summary-line total"><span>Total USD</span><span>{{vm.total() | currency:'$':2}}</span></div><p class="delivery-note">Delivery method: digital resources.<br>Shipping: $0.00. Your billing address is recorded for this demonstration.</p><button type="button" class="quiet-link btn btn-link p-0" ng-click="vm.load()">Reload summary</button>
+        </aside></div>
+      </div>
+    </div>
+  </main>
+  <footer class="container site-footer">The Community Hub · Community Blog · Group 1<br><span class="footer-note">Course demonstration. Use sample information. Payments, delivery and refunds are simulated.</span></footer>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" ng-strict-di>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Review the stories our community has submitted. Read the full post, then record an approval or rejection."><title>Review Queue | The Community Hub</title>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css"><link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/l10.css">
+  <script defer src="vendor/jquery-3.7.1.min.js"></script><script defer src="vendor/angular-1.8.3.min.js"></script>
+  <script defer src="js/cart-store.js"></script><script defer src="js/l10-validation.js"></script><script defer src="js/l10-app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header"><nav class="navbar container" aria-label="Main navigation">
+    <a class="navbar-brand" href="index.html">The Community Hub<span class="brand-dot" aria-hidden="true">.</span></a>
+    <div class="nav"><a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link" href="products.html">Resources</a>
+      <a class="nav-link" href="cart.html">Cart</a>
+      <a class="nav-link" href="finalization.html">Preferences</a>
+      <a class="nav-link" href="submission.html">Submit</a>
+      <a class="nav-link active" href="approval.html" aria-current="page">Review</a>
+      <a class="nav-link" href="billing.html">Billing</a>
+      <a class="nav-link" href="returns.html">Returns</a>
+      <a class="nav-link" href="signup.html">Sign Up</a></div>
+  </nav></header>
+  <main class="container workflow-main" id="main-content" tabindex="-1" ng-controller="ApprovalController as vm">
+    <div class="workflow-heading"><p class="eyebrow">THE COMMUNITY EDITORIAL DESK</p><h1>A little care before we share<span class="brand-dot">.</span></h1><p class="lead-copy">Review the stories our community has submitted. Read the full post, then record an approval or rejection.</p></div>
+    <noscript><p class="alert alert-warning">Enable JavaScript to use this page.</p></noscript>
+    <div ng-cloak>
+      <div id="form-feedback" tabindex="-1" class="alert" ng-if="vm.flash" ng-class="'alert-' + vm.flash.type" ng-attr-role="{{vm.flash.type === 'danger' ? 'alert' : 'status'}}" ng-bind="vm.flash.text"></div>
+
+      <div class="review-stats" aria-label="Submission totals"><div class="review-stat"><strong ng-bind="vm.count('pending')"></strong><span class="status-pill">Pending</span></div><div class="review-stat"><strong ng-bind="vm.count('approved')"></strong><span class="status-pill approved">Approved</span></div><div class="review-stat"><strong ng-bind="vm.count('rejected')"></strong><span class="status-pill rejected">Rejected</span></div></div>
+      <div class="review-toolbar"><div><label class="form-label" for="review-query">Find a submission</label><input type="search" id="review-query" class="form-control" ng-model="vm.query" placeholder="Search by title, author or post ID"></div><div><label class="form-label" for="review-status">Review status</label><select class="form-select" id="review-status" ng-model="vm.status"><option value="">All submissions</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></div><button type="button" class="btn btn-outline-secondary" ng-click="vm.reload()" ng-disabled="vm.busy">{{vm.busy ? 'Loading...' : 'Reload queue'}}</button></div>
+      <p role="status" class="text-secondary small" ng-if="vm.loaded">{{vm.filtered().length}} submissions shown</p><p role="status" class="workflow-loader" ng-if="vm.busy && !vm.loaded">Loading the review queue...</p>
+      <div class="empty-panel" ng-if="vm.loaded && !vm.filtered().length"><h2>A quiet moment in the queue.</h2><p class="text-secondary">There are no submissions matching these filters.</p><a href="submission.html" class="btn btn-primary">Submit a community story</a></div>
+      <section class="review-list" aria-label="Submissions"><article class="review-card" ng-repeat="record in vm.filtered() track by record.id">
+        <div class="review-card-head"><div><p class="panel-kicker" ng-bind="record.category"></p><h2 ng-bind="record.title"></h2><p class="review-meta mb-0">By <strong ng-bind="record.author"></strong> · {{record.createdAt | date:'MMM d, yyyy, h:mm a'}} · {{record.id}}</p></div><span class="status-pill" ng-class="record.status" ng-bind="record.status"></span></div>
+        <p class="review-summary" ng-bind="record.summary"></p><div class="review-body" ng-if="record.expanded" ng-attr-id="{{'body-' + record.id}}" ng-bind="record.content"></div>
+        <div class="review-footer"><button type="button" class="btn btn-outline-secondary btn-sm" ng-click="record.expanded = !record.expanded" ng-attr-aria-expanded="{{!!record.expanded}}">{{record.expanded ? 'Hide full post' : 'Read full post'}}</button><div class="review-decisions" ng-if="record.status === 'pending'"><button class="btn btn-approve btn-sm" type="button" ng-click="vm.decide(record,'approved')" ng-disabled="vm.busy" ng-attr-aria-label="{{'Approve ' + record.title}}">Approve</button><button class="btn btn-outline-danger btn-sm" type="button" ng-click="vm.decide(record,'rejected')" ng-disabled="vm.busy" ng-attr-aria-label="{{'Reject ' + record.title}}">Reject</button></div><span class="review-meta" ng-if="record.status !== 'pending'">Decision saved {{record.reviewedAt | date:'MMM d, h:mm a'}}</span></div>
+      </article></section>
+    </div>
+  </main>
+  <footer class="container site-footer">The Community Hub · Community Blog · Group 1<br><span class="footer-note">Course demonstration. Use sample information. Payments, delivery and refunds are simulated.</span></footer>
+</body>
+</html>

@@ -5,15 +5,18 @@ const { randomUUID } = require('node:crypto');
 const { validateMember } = require('./public/js/validation');
 const { createProductHandler } = require('./lib/product-api');
 const { createFinalizationHandler } = require('./lib/finalization-api');
+const { createWorkflowHandler } = require('./lib/workflow-api');
 const publicDirectory = path.join(__dirname, 'public');
 
 function createServer({
   dataFile = path.join(__dirname, 'data', 'members.json'),
   productDataFile = path.join(__dirname, 'data', 'products.json'),
-  finalizationDataFile = path.join(__dirname, 'data', 'finalizations.json')
+  finalizationDataFile = path.join(__dirname, 'data', 'finalizations.json'),
+  l10Directory = path.join(__dirname, 'data')
 } = {}) {
   const handleProducts = createProductHandler({ dataFile: productDataFile, seedFile: path.join(publicDirectory, 'data', 'products.json') });
   const handleFinalizations = createFinalizationHandler({ dataFile: finalizationDataFile, productDataFile, seedFile: path.join(publicDirectory, 'data', 'products.json') });
+  const handleWorkflow = createWorkflowHandler({ dataDirectory: l10Directory, productDataFile, seedFile: path.join(publicDirectory, 'data', 'products.json') });
   function readMembers() {
     const members = fs.existsSync(dataFile) ? JSON.parse(fs.readFileSync(dataFile, 'utf8')) : [];
     if (!Array.isArray(members)) throw new Error('Invalid member data.');
@@ -26,6 +29,7 @@ function createServer({
   return http.createServer(async (req, res) => {
     try {
       const pathname = new URL(req.url, 'http://localhost').pathname;
+      if (await handleWorkflow(req, res, pathname)) return;
       if (await handleFinalizations(req, res, pathname)) return;
       if (await handleProducts(req, res, pathname)) return;
       if (pathname === '/api/members' && req.method === 'GET') return reply(res, 200, readMembers());

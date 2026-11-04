@@ -1,0 +1,61 @@
+[
+  {
+    "schemaVersion": 1,
+    "requestId": "d0102f4a-75f3-4549-8d51-ce2114f604c5",
+    "createdAt": "2026-11-04T17:55:35.422Z",
+    "document": {
+      "title": "A neighborhood book club for everyone",
+      "author": "Demo Contributor",
+      "category": "Reading",
+      "summary": "A friendly book club brings neighbors together through reading and conversation.",
+      "content": "Our neighborhood book club meets once a month. Each reader brings a favorite passage and a question. We make time for everyone to share, even if they have not finished the book. A simple welcome and a shared story can help a new neighbor feel at home."
+    },
+    "id": "POST-C17B9F42",
+    "title": "A neighborhood book club for everyone",
+    "author": "Demo Contributor",
+    "category": "Reading",
+    "summary": "A friendly book club brings neighbors together through reading and conversation.",
+    "content": "Our neighborhood book club meets once a month. Each reader brings a favorite passage and a question. We make time for everyone to share, even if they have not finished the book. A simple welcome and a shared story can help a new neighbor feel at home.",
+    "status": "approved",
+    "reviewedAt": "2026-11-04T17:55:36.370Z"
+  },
+  {
+    "schemaVersion": 1,
+    "requestId": "542f8bb8-f74e-449c-ae0b-c76d96e87bc5",
+    "createdAt": "2026-11-04T17:55:35.794Z",
+    "document": {
+      "title": "A creative afternoon in the neighborhood",
+      "author": "Demo Contributor",
+      "category": "Reading",
+      "summary": "A friendly book club brings neighbors together through reading and conversation.",
+      "content": "Our neighborhood book club meets once a month. Each reader brings a favorite passage and a question. We make time for everyone to share, even if they have not finished the book. A simple welcome and a shared story can help a new neighbor feel at home."
+    },
+    "id": "POST-E8189844",
+    "title": "A creative afternoon in the neighborhood",
+    "author": "Demo Contributor",
+    "category": "Reading",
+    "summary": "A friendly book club brings neighbors together through reading and conversation.",
+    "content": "Our neighborhood book club meets once a month. Each reader brings a favorite passage and a question. We make time for everyone to share, even if they have not finished the book. A simple welcome and a shared story can help a new neighbor feel at home.",
+    "status": "rejected",
+    "reviewedAt": "2026-11-04T17:55:36.435Z"
+  },
+  {
+    "schemaVersion": 1,
+    "requestId": "49b0543d-5c79-4f7d-bede-6ae43da30f58",
+    "createdAt": "2026-11-04T17:55:43.151Z",
+    "document": {
+      "title": "A story retained after a lost response",
+      "author": "Demo Contributor",
+      "category": "Reading",
+      "summary": "A friendly book club brings neighbors together through reading and conversation.",
+      "content": "Our neighborhood book club meets once a month. Each reader brings a favorite passage and a question. We make time for everyone to share, even if they have not finished the book. A simple welcome and a shared story can help a new neighbor feel at home."
+    },
+    "id": "POST-D188A577",
+    "title": "A story retained after a lost response",
+    "author": "Demo Contributor",
+    "category": "Reading",
+    "summary": "A friendly book club brings neighbors together through reading and conversation.",
+    "content": "Our neighborhood book club meets once a month. Each reader brings a favorite passage and a question. We make time for everyone to share, even if they have not finished the book. A simple welcome and a shared story can help a new neighbor feel at home.",
+    "status": "pending"
+  }
+]

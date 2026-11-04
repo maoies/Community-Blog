@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en" ng-strict-di>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Share a local discovery, a creative idea or a useful resource. Our reviewers will read your story before it joins the community."><title>Submit a Story | The Community Hub</title>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css"><link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/l10.css">
+  <script defer src="vendor/jquery-3.7.1.min.js"></script><script defer src="vendor/angular-1.8.3.min.js"></script>
+  <script defer src="js/cart-store.js"></script><script defer src="js/l10-validation.js"></script><script defer src="js/l10-app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header"><nav class="navbar container" aria-label="Main navigation">
+    <a class="navbar-brand" href="index.html">The Community Hub<span class="brand-dot" aria-hidden="true">.</span></a>
+    <div class="nav"><a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link" href="products.html">Resources</a>
+      <a class="nav-link" href="cart.html">Cart</a>
+      <a class="nav-link" href="finalization.html">Preferences</a>
+      <a class="nav-link active" href="submission.html" aria-current="page">Submit</a>
+      <a class="nav-link" href="approval.html">Review</a>
+      <a class="nav-link" href="billing.html">Billing</a>
+      <a class="nav-link" href="returns.html">Returns</a>
+      <a class="nav-link" href="signup.html">Sign Up</a></div>
+  </nav></header>
+  <main class="container workflow-main" id="main-content" tabindex="-1" ng-controller="SubmissionController as vm">
+    <div class="workflow-heading"><p class="eyebrow">FROM OUR COMMUNITY</p><h1>Every story starts with you<span class="brand-dot">.</span></h1><p class="lead-copy">Share a local discovery, a creative idea or a useful resource. Our reviewers will read your story before it joins the community.</p></div>
+    <noscript><p class="alert alert-warning">Enable JavaScript to use this page.</p></noscript>
+    <div ng-cloak>
+      <div id="form-feedback" tabindex="-1" class="alert" ng-if="vm.flash" ng-class="'alert-' + vm.flash.type" ng-attr-role="{{vm.flash.type === 'danger' ? 'alert' : 'status'}}" ng-bind="vm.flash.text"></div>
+
+      <section class="workflow-panel confirmation" ng-if="vm.saved" aria-labelledby="submission-success">
+        <span class="confirmation-icon" aria-hidden="true">✓</span><p class="panel-kicker">THANK YOU FOR SHARING</p><h2 id="submission-success">Your story is in the queue.</h2>
+        <p><strong ng-bind="vm.saved.title"></strong> has been saved for review.</p><p class="confirmation-code" ng-bind="vm.saved.id"></p><span class="status-pill">Pending review</span>
+        <div class="workflow-actions"><a class="btn btn-primary" href="approval.html">View review queue</a><button class="btn btn-outline-secondary" type="button" ng-click="vm.startOver()">Write another story</button></div>
+        <details class="json-details"><summary>View saved submission JSON</summary><pre ng-bind="vm.pretty(vm.saved)"></pre></details>
+      </section>
+      <div class="workflow-layout" ng-if="!vm.saved">
+        <section class="workflow-panel"><h2>Your contribution</h2><p class="text-secondary small mb-4">All fields are required. Write in your own voice and keep personal details out of your story.</p>
+          <form id="submission-form" ng-submit="vm.submit()" novalidate><div class="form-grid">
+            <div class="wide"><label class="form-label" for="title">Post title</label>
+<input class="form-control" id="title" name="title" type="text" ng-model="vm.form.title" ng-change="vm.clear('title')" ng-class="{'is-invalid':vm.errors.title}" ng-attr-aria-invalid="{{!!vm.errors.title}}" aria-describedby="title-help title-error" maxlength="100" autocomplete="off">
+<p class="field-help" id="title-help">A clear title in 5-100 characters.</p>
+<p class="field-error" id="title-error" ng-if="vm.errors.title" ng-bind="vm.errors.title"></p></div>
+            <div class=""><label class="form-label" for="author">Author name</label>
+<input class="form-control" id="author" name="author" type="text" ng-model="vm.form.author" ng-change="vm.clear('author')" ng-class="{'is-invalid':vm.errors.author}" ng-attr-aria-invalid="{{!!vm.errors.author}}" aria-describedby="author-help author-error" maxlength="60" autocomplete="name">
+<p class="field-help" id="author-help">The name you want readers to see.</p>
+<p class="field-error" id="author-error" ng-if="vm.errors.author" ng-bind="vm.errors.author"></p></div>
+            <div class=""><label class="form-label" for="category">Category</label>
+<select class="form-select" id="category" name="category" ng-model="vm.form.category" ng-options="option for option in vm.categories" ng-change="vm.clear('category')" ng-class="{'is-invalid':vm.errors.category}" ng-attr-aria-invalid="{{!!vm.errors.category}}" aria-describedby="category-error"><option value="">Choose an option</option></select>
+<p class="field-error" id="category-error" ng-if="vm.errors.category" ng-bind="vm.errors.category"></p></div>
+            <div class="wide"><div class="field-meta"><label class="form-label" for="summary">Short summary</label><span class="field-help">{{(vm.form.summary || '').length}} / 250</span></div>
+<textarea class="form-control" id="summary" name="summary" rows="3" maxlength="250" ng-model="vm.form.summary" ng-change="vm.clear('summary')" ng-class="{'is-invalid':vm.errors.summary}" ng-attr-aria-invalid="{{!!vm.errors.summary}}" aria-describedby="summary-help summary-error"></textarea>
+<p class="field-help" id="summary-help">Introduce your story in 20-250 characters. This appears on the preview card.</p><p class="field-error" id="summary-error" ng-if="vm.errors.summary" ng-bind="vm.errors.summary"></p></div>
+            <div class="wide"><div class="field-meta"><label class="form-label" for="content">Post content</label><span class="field-help">{{(vm.form.content || '').length}} / 5000</span></div>
+<textarea class="form-control" id="content" name="content" rows="8" maxlength="5000" ng-model="vm.form.content" ng-change="vm.clear('content')" ng-class="{'is-invalid':vm.errors.content}" ng-attr-aria-invalid="{{!!vm.errors.content}}" aria-describedby="content-help content-error"></textarea>
+<p class="field-help" id="content-help">Use 50-5,000 characters. Plain text keeps your story easy to read.</p><p class="field-error" id="content-error" ng-if="vm.errors.content" ng-bind="vm.errors.content"></p></div>
+          </div><div class="workflow-actions"><button class="btn btn-primary" type="submit" ng-disabled="vm.busy">{{vm.busy ? 'Submitting...' : 'Submit for review'}}</button><a class="quiet-link" href="approval.html">Visit the review queue</a></div></form>
+        </section>
+        <aside class="workflow-panel story-preview" aria-labelledby="preview-title"><div class="preview-label"><span class="panel-kicker">LIVE PREVIEW</span><span class="status-pill">Draft</span></div>
+          <p class="eyebrow" ng-bind="vm.form.category || 'COMMUNITY STORIES'"></p><h2 class="preview-title" id="preview-title" ng-bind="vm.form.title || 'Your story starts here'"></h2>
+          <p class="preview-summary" ng-bind="vm.form.summary || 'A short introduction helps the community discover what makes your story worth reading.'"></p><p class="preview-author">By <span ng-bind="vm.form.author || 'a community contributor'"></span></p>
+          <hr><p class="field-help">Submissions begin as pending. A reviewer can approve or reject them from the review queue.</p><details class="json-details"><summary>Preview submission JSON</summary><pre ng-bind="vm.pretty(vm.preview())"></pre></details>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <footer class="container site-footer">The Community Hub · Community Blog · Group 1<br><span class="footer-note">Course demonstration. Use sample information. Payments, delivery and refunds are simulated.</span></footer>
+</body>
+</html>

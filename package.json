@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "build": "node lib/build-finalization.js",
-    "test": "node --test"
+    "test": "node --test",
+    "test:l10": "node --test tests/l10.test.js"
   },
   "engines": {
     "node": ">=18"

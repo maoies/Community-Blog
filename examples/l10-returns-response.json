@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "requestId": "41f939e8-4f5a-49c3-bf18-a8bb7dba8339",
+  "createdAt": "2026-11-04T17:55:41.603Z",
+  "document": {
+    "orderId": "ORD-B082E080",
+    "items": [
+      {
+        "productId": "P101",
+        "quantity": 1
+      }
+    ],
+    "reason": "Wrong resource selected",
+    "condition": "Not accessed",
+    "notes": "I selected this resource by mistake."
+  },
+  "id": "RET-AC42D445",
+  "orderId": "ORD-B082E080",
+  "items": [
+    {
+      "productId": "P101",
+      "name": "Community Reading Guide",
+      "description": "Make a little room for reading. A digital guide with reading prompts, book club questions, and a simple reading journal.",
+      "category": "Reading",
+      "unitOfMeasure": "Download",
+      "price": 4.99,
+      "quantity": 1,
+      "lineSubtotal": 4.99
+    }
+  ],
+  "reason": "Wrong resource selected",
+  "condition": "Not accessed",
+  "notes": "I selected this resource by mistake.",
+  "currency": "USD",
+  "requestedAmount": 4.99,
+  "status": "requested"
+}
