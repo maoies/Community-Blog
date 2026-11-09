@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" ng-strict-di>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Find your order, choose the resources and tell us what happened. Your return request will be saved for review."><title>Request a Return | The Community Hub</title>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css"><link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/l10.css">
+  <script defer src="vendor/jquery-3.7.1.min.js"></script><script defer src="vendor/angular-1.8.3.min.js"></script>
+  <script defer src="js/cart-store.js"></script><script defer src="js/l10-validation.js"></script><script defer src="js/l10-app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header"><nav class="navbar container" aria-label="Main navigation">
+    <a class="navbar-brand" href="index.html">The Community Hub<span class="brand-dot" aria-hidden="true">.</span></a>
+    <div class="nav"><a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link" href="products.html">Resources</a>
+      <a class="nav-link" href="cart.html">Cart</a>
+      <a class="nav-link" href="finalization.html">Preferences</a>
+      <a class="nav-link" href="submission.html">Submit</a>
+      <a class="nav-link" href="approval.html">Review</a>
+      <a class="nav-link" href="billing.html">Billing</a>
+      <a class="nav-link active" href="returns.html" aria-current="page">Returns</a>
+      <a class="nav-link" href="signup.html">Sign Up</a></div>
+  </nav></header>
+  <main class="container workflow-main" id="main-content" tabindex="-1" ng-controller="ReturnsController as vm">
+    <div class="workflow-heading"><p class="eyebrow">WE ARE HERE TO HELP</p><h1>Let's make things right<span class="brand-dot">.</span></h1><p class="lead-copy">Find your order, choose the resources and tell us what happened. Your return request will be saved for review.</p></div>
+    <noscript><p class="alert alert-warning">Enable JavaScript to use this page.</p></noscript>
+    <div ng-cloak>
+      <div id="form-feedback" tabindex="-1" class="alert" ng-if="vm.flash" ng-class="'alert-' + vm.flash.type" ng-attr-role="{{vm.flash.type === 'danger' ? 'alert' : 'status'}}" ng-bind="vm.flash.text"></div>
+
+      <ol class="return-flow" aria-label="Return request steps"><li><span>1</span>Find your order</li><li><span>2</span>Select resources</li><li><span>3</span>Request a review</li></ol>
+      <section class="workflow-panel confirmation" ng-if="vm.saved" aria-labelledby="returns-success"><span class="confirmation-icon" aria-hidden="true">✓</span><p class="panel-kicker">REQUEST RECEIVED</p><h2 id="returns-success">Your return is ready for review.</h2><p class="confirmation-code" ng-bind="vm.saved.id"></p><span class="status-pill requested">Requested</span><p class="mt-3">Order <strong ng-bind="vm.saved.orderId"></strong> · Requested amount {{vm.saved.requestedAmount | currency:'$':2}}</p><p class="text-secondary">This records a demonstration request. The amount is subject to review; no refund has been issued.</p><div class="workflow-actions"><button class="btn btn-primary" type="button" ng-click="vm.restart()">Review remaining resources</button><a class="btn btn-outline-secondary" href="cart.html">Back to collection</a></div><details class="json-details"><summary>View saved return JSON</summary><pre ng-bind="vm.pretty(vm.saved)"></pre></details></section>
+      <div ng-if="!vm.saved"><section class="workflow-panel mb-4" aria-labelledby="lookup-title"><h2 id="lookup-title">01 / Find your order</h2><form id="order-lookup-form" class="lookup-form" ng-submit="vm.loadOrder()" novalidate><div class="lookup-field"><label class="form-label" for="orderId">Order number</label><input id="orderId" name="orderId" class="form-control" ng-model="vm.lookup" ng-change="vm.clear('orderId')" placeholder="ORD-12AB34CD" maxlength="12" ng-class="{'is-invalid':vm.errors.orderId}" ng-attr-aria-invalid="{{!!vm.errors.orderId}}" aria-describedby="orderId-help orderId-error"><p class="field-help" id="orderId-help">Use the number shown after submitting demonstration billing details.</p><p class="field-error" id="orderId-error" ng-if="vm.errors.orderId" ng-bind="vm.errors.orderId"></p></div><button class="btn btn-primary" type="submit" ng-disabled="vm.busy">{{vm.busy ? 'Loading...' : 'Find order'}}</button></form><a class="quiet-link" href="billing.html" ng-if="!vm.order">Create a demonstration order</a></section>
+        <div class="workflow-layout" ng-if="vm.order"><section class="workflow-panel"><div class="return-order-heading"><h2>02 / Select resources</h2><span class="panel-kicker" ng-bind="vm.order.id"></span></div><label class="form-label" for="return-search">Search resources in this order</label><input type="search" class="form-control" id="return-search" ng-model="vm.query" ng-change="vm.search()" placeholder="Search by name, category or product ID"><p class="field-help mt-2" role="status">{{vm.filteredRows.length}} resources found</p><p class="workflow-note mt-3" ng-if="!vm.filteredRows.length">No resources match this search. Try a shorter name or product ID.</p>
+          <form id="returns-form" ng-submit="vm.submit()" novalidate>
+            <div class="return-item" ng-class="{'unavailable':!item.availableQuantity}" ng-repeat="item in vm.filteredRows track by item.productId"><input class="form-check-input" type="checkbox" ng-attr-id="{{'return-' + item.productId}}" ng-model="item.selected" ng-change="vm.clear('items')" ng-disabled="!item.availableQuantity" ng-attr-aria-invalid="{{!!vm.errors.items}}" aria-describedby="items-error"><img ng-src="{{vm.image(item.productId)}}" ng-attr-alt="{{item.name + ' cover'}}"><div class="return-item-copy"><label ng-attr-for="{{'return-' + item.productId}}" ng-bind="item.name"></label><p>{{item.productId}} · {{item.price | currency:'$':2}} each</p><p>Purchased {{item.quantity}} · Available {{item.availableQuantity}}</p><p ng-if="!item.availableQuantity">Already included in a return request.</p></div><div class="quantity-field"><label class="field-help" ng-attr-for="{{'return-qty-' + item.productId}}">Return qty</label><input type="number" class="form-control" ng-attr-id="{{'return-qty-' + item.productId}}" ng-model="item.returnQuantity" ng-model-options="{allowInvalid:true}" ng-change="vm.clear('items')" min="1" ng-attr-max="{{item.availableQuantity}}" step="1" ng-disabled="!item.selected || !item.availableQuantity" ng-attr-aria-label="{{'Return quantity for ' + item.name}}"></div></div>
+            <p class="field-error" id="items-error" ng-if="vm.errors.items" ng-bind="vm.errors.items"></p><div class="return-tally"><span>{{vm.selected().length}} resources selected</span><span>{{vm.amount() | currency:'$':2}} requested</span></div>
+            <fieldset class="form-section"><legend>03 / Tell us what happened</legend><div class="form-grid"><div class="wide"><label class="form-label" for="reason">Reason for return</label>
+<select class="form-select" id="reason" name="reason" ng-model="vm.form.reason" ng-options="option for option in vm.reasons" ng-change="vm.clear('reason')" ng-class="{'is-invalid':vm.errors.reason}" ng-attr-aria-invalid="{{!!vm.errors.reason}}" aria-describedby="reason-error"><option value="">Choose an option</option></select>
+<p class="field-error" id="reason-error" ng-if="vm.errors.reason" ng-bind="vm.errors.reason"></p></div><div class="wide"><label class="form-label" for="condition">Resource condition</label>
+<select class="form-select" id="condition" name="condition" ng-model="vm.form.condition" ng-options="option for option in vm.conditions" ng-change="vm.clear('condition')" ng-class="{'is-invalid':vm.errors.condition}" ng-attr-aria-invalid="{{!!vm.errors.condition}}" aria-describedby="condition-error"><option value="">Choose an option</option></select>
+<p class="field-error" id="condition-error" ng-if="vm.errors.condition" ng-bind="vm.errors.condition"></p></div><div class="wide"><div class="field-meta"><label class="form-label" for="notes">Additional details</label><span class="field-help">{{(vm.form.notes || '').length}} / 500</span></div>
+<textarea class="form-control" id="notes" name="notes" rows="4" maxlength="500" ng-model="vm.form.notes" ng-change="vm.clear('notes')" ng-class="{'is-invalid':vm.errors.notes}" ng-attr-aria-invalid="{{!!vm.errors.notes}}" aria-describedby="notes-help notes-error"></textarea>
+<p class="field-help" id="notes-help">Optional unless you select Other. Then add at least 10 characters.</p><p class="field-error" id="notes-error" ng-if="vm.errors.notes" ng-bind="vm.errors.notes"></p></div></div></fieldset>
+            <div class="workflow-actions"><button class="btn btn-primary" type="submit" ng-disabled="vm.busy">{{vm.busy ? 'Submitting...' : 'Submit return request'}}</button><button class="btn btn-outline-secondary" type="button" ng-click="vm.loadOrder()" ng-disabled="vm.busy">Reload order</button></div><details class="json-details"><summary>Preview return JSON</summary><pre ng-bind="vm.pretty(vm.payload())"></pre></details>
+          </form>
+        </section><aside class="workflow-panel"><p class="panel-kicker">A LITTLE REASSURANCE</p><h2>Your request at a glance</h2><div class="summary-line"><span>Order</span><strong ng-bind="vm.order.id"></strong></div><div class="summary-line"><span>Selected resources</span><span>{{vm.selected().length}}</span></div><div class="summary-line total"><span>Requested</span><span>{{vm.amount() | currency:'$':2}}</span></div><p class="delivery-note">These are digital resources. Choose the condition that best describes your access to them. Previously requested quantities are excluded from availability.</p><p class="field-help">Requests are saved for review. This demonstration does not issue refunds.</p></aside></div>
+      </div>
+    </div>
+  </main>
+  <footer class="container site-footer">The Community Hub · Community Blog · Group 1<br><span class="footer-note">Course demonstration. Use sample information. Payments, delivery and refunds are simulated.</span></footer>
+</body>
+</html>

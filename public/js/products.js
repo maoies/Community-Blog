@@ -1,6 +1,6 @@
 'use strict';
 (function () {
-  if (!window.jQuery || !window.ProductCatalog) {
+  if (!window.jQuery || !window.ProductCatalog || !window.CommunityCart) {
     document.getElementById('catalog-message').textContent = 'Product tools could not load. Refresh this page to try again.';
     const retry = document.getElementById('retry-load');
     retry.classList.remove('d-none');
@@ -14,6 +14,8 @@
     const fields = ['name', 'description', 'category', 'unitOfMeasure', 'price'];
     const allFields = ['productId', ...fields];
     const dialog = document.getElementById('discard-dialog');
+    const deleteDialog = document.getElementById('delete-product-dialog');
+    let busy = false;
     let selected = null;
     let submitted = false;
     let ready = false;
@@ -38,12 +40,21 @@
 
     function updateEditState() {
       const dirty = isDirty();
-      $('#edit-state').toggleClass('is-dirty', dirty).text(dirty ? 'Unsaved changes' : (creating ? 'New product' : (savedSelection ? 'Saved in browser' : 'Ready to edit')));
+      $('#edit-state').toggleClass('is-dirty', dirty).text(!selected && !creating ? 'No selection' : (dirty ? 'Unsaved changes' : (creating ? 'New product' : (savedSelection ? (catalog.isShared() ? 'Saved to server' : 'Saved in browser') : 'Ready to edit'))));
       $('#save-hint').text(dirty ? 'Changes are not saved yet.' : (creating ? 'Fill in the details to add a product.' : 'No unsaved changes.'));
-      $('#save-changes').prop('disabled', !ready || (!creating && !dirty)).text(creating ? 'Add product' : 'Save changes');
-      $('#discard-changes').prop('disabled', !creating && !dirty).text(creating ? 'Cancel' : 'Discard');
-      $('#export-products').prop('disabled', !ready || creating || dirty)
+      $('#save-changes').prop('disabled', busy || !ready || (!creating && !dirty)).text(busy ? 'Saving...' : (creating ? 'Add product' : 'Save changes'));
+      $('#discard-changes').prop('disabled', busy || (!creating && !dirty)).text(creating ? 'Cancel' : 'Discard');
+      $('#export-products').prop('disabled', busy || !ready || creating || dirty)
         .attr('title', creating || dirty ? 'Save or cancel your edits before downloading.' : 'Download the saved product catalog.');
+      $('#add-product-to-cart, #delete-product').prop('disabled', busy || !ready || !selected || creating || dirty)
+        .attr('title', dirty || creating ? 'Save or discard the draft first.' : 'Use the saved product details.');
+    }
+
+    function setBusy(value) {
+      busy = value;
+      $('#product-form :input, #new-product, #clear-search, .product-choice').prop('disabled', value);
+      $('#search-fields').prop('disabled', value);
+      updateEditState();
     }
 
     function setErrors(errors) {
@@ -67,7 +78,7 @@
       for (const product of results) {
         const $choice = $('<button>', {
           type: 'button', class: 'product-choice',
-          'data-product-id': product.productId,
+          'data-product-id': product.productId, disabled: busy,
           'aria-pressed': String(selected?.productId === product.productId),
           'aria-label': 'Edit ' + product.name + ', ' + product.productId + ', ' + catalog.money(product.price)
         });
@@ -139,6 +150,7 @@
     }
 
     function confirmLeave(action) {
+      if (busy) { showEditMessage('Please wait for the current product request to finish.', 'info'); return; }
       if (!isDirty()) { action(); return; }
       pendingAction = action;
       dialog.showModal();
@@ -166,6 +178,9 @@
         $('#catalog-message').text('');
         const notice = catalog.getNotice();
         if (notice) $('#catalog-notice').removeClass('d-none').text(notice);
+        $('#catalog-storage-note').text(catalog.isShared()
+          ? 'Products are shared through the project server. Download JSON to keep a file copy.'
+          : 'Static demo: product edits stay in this browser. Start the Node server for shared products and HTTP requests.');
         if (products.length) chooseProduct(products[0].productId, false);
         else {
           renderResults();
@@ -205,9 +220,9 @@
       if (submitted) setErrors(catalog.validate(inputValues(), { creating }).errors);
       $('#edit-message').addClass('d-none');
     });
-    $('#product-form').on('submit', function (event) {
+    $('#product-form').on('submit', async function (event) {
       event.preventDefault();
-      if ((!selected && !creating) || (!creating && !isDirty())) return;
+      if (busy || (!selected && !creating) || (!creating && !isDirty())) return;
       submitted = true;
       const result = catalog.validate(inputValues(), { creating });
       setErrors(result.errors);
@@ -216,10 +231,10 @@
         $('#product-form .is-invalid').first().trigger('focus');
         return;
       }
-      $('#save-changes').prop('disabled', true).text('Saving...');
+      setBusy(true);
       try {
         const wasCreating = creating;
-        selected = creating ? catalog.create(result.product) : catalog.update(selected.productId, result.product, selected);
+        selected = creating ? await catalog.create(result.product) : await catalog.update(selected.productId, result.product, selected);
         creating = false;
         draftStart = null;
         $('#productId').val(selected.productId).prop('readOnly', true);
@@ -229,14 +244,13 @@
         savedSelection = true;
         submitted = false;
         $('#catalog-notice').addClass('d-none');
-        showEditMessage(selected.productId + (wasCreating ? ' added.' : ' updated.') + ' Saved in this browser.', 'success');
+        showEditMessage(selected.productId + (wasCreating ? ' added.' : ' updated.') + (catalog.isShared() ? ' Saved to the project server.' : ' Saved in this browser.'), 'success');
         if (wasCreating) $('#search-query, #category-filter').val('');
         renderResults();
       } catch (error) {
         showEditMessage(error.message, 'danger');
       } finally {
-        $('#save-changes').text('Save changes');
-        updateEditState();
+        setBusy(false);
       }
     });
 
@@ -254,14 +268,14 @@
     });
     dialog.addEventListener('cancel', () => { pendingAction = null; });
     $('a[href]').on('click', function (event) {
-      if (!isDirty() || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
+      if ((!isDirty() && !busy) || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
       const destination = new URL(this.href);
       if (destination.pathname === window.location.pathname && destination.hash) return;
       event.preventDefault();
       confirmLeave(() => { selected = null; creating = false; window.location.href = destination.href; });
     });
     window.addEventListener('beforeunload', function (event) {
-      if (isDirty()) { event.preventDefault(); event.returnValue = ''; }
+      if (isDirty() || busy) { event.preventDefault(); event.returnValue = ''; }
     });
 
     $('#export-products').on('click', function () {
@@ -271,8 +285,45 @@
       const link = document.createElement('a');
       link.href = url;
       link.download = 'products.json';
+      document.body.append(link);
       link.click();
+      link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+    $('#add-product-to-cart').on('click', function () {
+      if (!selected || creating || isDirty() || busy) return;
+      try {
+        const quantity = window.CommunityCart.add(selected.productId);
+        showEditMessage(selected.name + ' added to your cart. Quantity: ' + quantity + '. Open Cart to review it.', 'success');
+      } catch (error) { showEditMessage(error.message, 'danger'); }
+    });
+    $('#delete-product').on('click', function () {
+      if (!selected || creating || isDirty() || busy) return;
+      $('#delete-product-name').text(selected.name);
+      deleteDialog.showModal();
+    });
+    $('#cancel-delete-product').on('click', () => deleteDialog.close());
+    $('#confirm-delete-product').on('click', async function () {
+      if (!selected || busy) return;
+      const removed = selected;
+      deleteDialog.close();
+      setBusy(true);
+      try {
+        await catalog.remove(removed.productId, removed);
+        selected = null;
+        $('#search-query, #category-filter').val('');
+        const next = catalog.getAll()[0];
+        if (next) chooseProduct(next.productId);
+        else {
+          $('#editor-content').addClass('d-none');
+          $('#editor-placeholder').removeClass('d-none');
+          $('#editor-title').text('Choose a product');
+          $('#edit-state').text('No selection');
+          renderResults();
+        }
+        $('#catalog-message').text(removed.productId + ' deleted from the catalog.');
+      } catch (error) { showEditMessage(error.message, 'danger'); }
+      finally { setBusy(false); }
     });
     $('#retry-load').on('click', loadProducts);
     loadProducts();

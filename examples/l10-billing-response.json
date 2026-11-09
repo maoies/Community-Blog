@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "requestId": "b08d37bb-f42d-4953-807d-b4fb1cc333a0",
+  "createdAt": "2026-11-04T17:55:39.803Z",
+  "document": {
+    "fullName": "Demo Reader",
+    "email": "demo@example.com",
+    "address": {
+      "line1": "123 Example Lane",
+      "line2": "",
+      "city": "Sample City",
+      "region": "PA",
+      "postalCode": "16801",
+      "country": "United States"
+    },
+    "payment": {
+      "method": "demo_card",
+      "last4": "4242",
+      "expiration": "12/28"
+    },
+    "items": [
+      {
+        "productId": "P101",
+        "quantity": 1
+      },
+      {
+        "productId": "P102",
+        "quantity": 1
+      }
+    ]
+  },
+  "id": "ORD-B082E080",
+  "fullName": "Demo Reader",
+  "email": "demo@example.com",
+  "address": {
+    "line1": "123 Example Lane",
+    "line2": "",
+    "city": "Sample City",
+    "region": "PA",
+    "postalCode": "16801",
+    "country": "United States"
+  },
+  "payment": {
+    "method": "demo_card",
+    "last4": "4242",
+    "expiration": "12/28"
+  },
+  "currency": "USD",
+  "items": [
+    {
+      "productId": "P101",
+      "name": "Community Reading Guide",
+      "description": "Make a little room for reading. A digital guide with reading prompts, book club questions, and a simple reading journal.",
+      "category": "Reading",
+      "unitOfMeasure": "Download",
+      "price": 4.99,
+      "quantity": 1,
+      "lineSubtotal": 4.99,
+      "availableQuantity": 0
+    },
+    {
+      "productId": "P102",
+      "name": "The Everyday Journal",
+      "description": "Our monthly digital magazine brings together community stories about small discoveries, creative hobbies, and everyday life.",
+      "category": "Magazine",
+      "unitOfMeasure": "Issue",
+      "price": 7.99,
+      "quantity": 1,
+      "lineSubtotal": 7.99,
+      "availableQuantity": 1
+    }
+  ],
+  "subtotal": 12.98,
+  "shipping": {
+    "method": "Digital delivery",
+    "amount": 0
+  },
+  "total": 12.98,
+  "status": "demo_confirmed"
+}

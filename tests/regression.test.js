@@ -118,7 +118,7 @@ test('current save errors keep the draft and allow retry', async (t) => {
 
 async function runningServer(t) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'community-hub-test-'));
-  const server = createServer({ dataFile: path.join(directory, 'members.json') });
+  const server = createServer({ dataFile: path.join(directory, 'members.json'), productDataFile: path.join(directory, 'products.json') });
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');
   t.after(async () => {
@@ -186,11 +186,11 @@ test('L7 catalog loads with real jQuery and supports search, validation, creatio
   const original = catalog.getById('P102');
   assert.equal(catalog.validate({ ...original, price: '-1' }).valid, false);
   assert.equal(catalog.validate({ ...original, price: '1.234' }).valid, false);
-  const updated = catalog.update('P102', { ...original, name: 'Updated magazine', price: '0' }, original);
+  const updated = await catalog.update('P102', { ...original, name: 'Updated magazine', price: '0' }, original);
   assert.equal(updated.price, 0);
-  const created = catalog.create({ ...original, productId: 'P106', name: 'New resource', price: '8.50' });
+  const created = await catalog.create({ ...original, productId: 'P106', name: 'New resource', price: '8.50' });
   assert.equal(created.price, 8.5);
-  assert.throws(() => catalog.create(created), /already exists/);
+  await assert.rejects(() => catalog.create(created), /already exists/);
   assert.equal(JSON.parse(catalog.toJSON()).length, 6);
   const saved = window.localStorage.getItem('community-hub.product-changes.v1');
   const restored = await JSDOM.fromURL(base + '/products.html', {
